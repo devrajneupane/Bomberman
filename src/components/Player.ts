@@ -2,6 +2,7 @@ import { CANVAS } from "../constants/canvas";
 import { MAP } from "../constants/map";
 import { DIRECTION_MAP } from "../constants/sprites";
 import { keys } from "../input/input";
+import { Layout } from "./Layout";
 import playerSprite from "/game/sprites/player/walking.png";
 
 type Camera = {
@@ -55,7 +56,8 @@ export default class Player {
   /**
    * Draw player on canvas
    */
-  draw() {
+  // draw(map: Layout) {
+  draw(layout: Layout) {
     this.elaspedFrame++;
     this.currentFrame = (this.currentFrame + 1) % this.frameIndexes.length;
 
@@ -70,6 +72,10 @@ export default class Player {
       this.direction = this.directions[1];
       this.frameBuffer();
       this.moveRight();
+      if (this.x > CANVAS.width / 2) {
+        layout.x -= this.speed;
+        // layout.x = layout.x;
+      }
     } else if (keys.up) {
       this.direction = this.directions[2];
       this.frameBuffer();
