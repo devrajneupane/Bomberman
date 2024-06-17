@@ -3,6 +3,9 @@
   line-height: 1.5;
   font-weight: 400;
 
+  margin: 0px;
+  padding: 0px;
+
   color-scheme: light dark;
   color: rgba(255, 255, 255, 0.87);
   background-color: #242424;
@@ -11,4 +14,24 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  padding: 100px;
+}
+
+#canvas {
+  border: 2px solid #aab;
+  border-radius: 30px;
+}
+
+#itemCanvas {
+  border: 2px solid teal;
+  border-radius: 10px;
+  display: none;
 }
