@@ -7,6 +7,16 @@ export const keys = {
   space: false,
 };
 
+export const mouse = {
+  itemX: 0,
+  itemY: 0,
+  canvasX: 0,
+  canvasY: 0,
+};
+
+const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
+const itemCanvas = document.querySelector<HTMLCanvasElement>("#itemCanvas")!;
+
 document.addEventListener("keydown", (event: KeyboardEvent) => {
   switch (event.key) {
     case "ArrowLeft":
@@ -52,4 +62,14 @@ document.addEventListener("keyup", () => {
   keys.down = false;
   keys.enter = false;
   keys.space = false;
+});
+
+itemCanvas.addEventListener("click", (event: MouseEvent) => {
+  mouse.itemX = event.x;
+  mouse.itemY = event.y;
+});
+
+canvas.addEventListener("click", (event: MouseEvent) => {
+  mouse.canvasX = event.x;
+  mouse.canvasY = event.y;
 });

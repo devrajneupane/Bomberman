@@ -1,53 +1,55 @@
 import { MAP } from "../constants/map";
-import hardWall from "/game/map/hard-wall.png";
 import Player from "./Player";
-import wall from "/game/sprites/wall/wall.png";
 import { CANVAS } from "../constants/canvas";
 import { images } from "../image/preload";
-import { images } from "../image/preload";
+
+export type MapData = {
+  width: number;
+  height: number;
+  tiles: number[][];
+};
 
 export class Layout {
   x: number = 0;
   y: number = 0;
-  width: number = MAP.tile.size;
-  height: number = MAP.tile.size;
+  mapData: MapData;
   ctx: CanvasRenderingContext2D;
-  img: HTMLImageElement;
+  img: HTMLImageElement = images.wall.hardWall;
 
-  constructor(ctx: CanvasRenderingContext2D) {
+  constructor(mapData: MapData, ctx: CanvasRenderingContext2D) {
+    this.mapData = mapData;
     this.ctx = ctx;
-
-    this.img = new Image();
   }
 
   /**
    * Draw layout on canvas
    */
   draw() {
-    this.ctx.drawImage(this.img, this.x, this.y, this.width, this.height);
+    this.ctx.drawImage(this.img, this.x, this.y, MAP.tile.size, MAP.tile.size);
   }
 
   /**
    * Renders map from json data
    */
-  renderMap(mapData: any, player: Player) {
-    const { width, height, tiles } = mapData;
-
-    for (let y = 0; y < height; y++) {
-      for (let x = 0; x < width; x++) {
-        const tileType = tiles[x][y];
+  renderMap(player: Player) {
+    for (let y = 0; y < this.mapData.height; y++) {
+      for (let x = 0; x < this.mapData.width; x++) {
+        const tileType = this.mapData.tiles[x][y];
 
         switch (tileType) {
           case 0:
-            this.img.src = wall;
-            break;
+            continue;
           case 1:
-            this.img.src = hardWall;
+            this.img = images.wall.hardWall;
+            break;
+          case 2:
+            this.img = images.wall.wall;
             break;
           default:
             break;
         }
 
+        // Move map
         // FIX: Still not working
         if (player.x >= CANVAS.width / 2) {
           this.x = (x - 1) * MAP.tile.size;
