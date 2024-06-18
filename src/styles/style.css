@@ -16,11 +16,22 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.game-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 50px;
+  padding: 100px;
+}
+
 #canvas {
   border: 2px solid #aab;
   border-radius: 30px;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+}
+
+#itemCanvas {
+  border: 2px solid teal;
+  border-radius: 10px;
+  display: none;
 }
