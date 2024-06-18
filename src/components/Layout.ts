@@ -3,6 +3,8 @@ import hardWall from "/game/map/hard-wall.png";
 import Player from "./Player";
 import wall from "/game/sprites/wall/wall.png";
 import { CANVAS } from "../constants/canvas";
+import { images } from "../image/preload";
+import { images } from "../image/preload";
 
 export class Layout {
   x: number = 0;
