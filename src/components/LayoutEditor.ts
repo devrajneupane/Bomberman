@@ -1,15 +1,16 @@
-import { mouse } from "../input/input";
+import { clicks } from "../input/input";
 import { images } from "../image/preload";
 import { Layout, MapData } from "./Layout";
 import { MAP } from "../constants/map";
 import { CANVAS } from "../constants/canvas";
+import { Items } from "../enums/items";
 
 interface Values {
   x: number;
   y: number;
   width: number;
   height: number;
-  active: boolean;
+  multiple: boolean;
 }
 
 export class LayoutEditor extends Layout {
@@ -17,6 +18,9 @@ export class LayoutEditor extends Layout {
   canvas: HTMLCanvasElement;
   itemCanvas: HTMLCanvasElement;
   itemCtx: CanvasRenderingContext2D;
+  activeItem: number;
+  filteredImages: { [key: string]: { [key: string]: HTMLImageElement } };
+  itemOffset: number = 0;
 
   constructor(
     mapData: MapData,
@@ -31,6 +35,21 @@ export class LayoutEditor extends Layout {
     this.canvas = canvas;
     this.ctx = ctx;
     this.items = {};
+    this.activeItem = Items.Empty;
+    this.filteredImages = {
+      wall: {
+        hardWall: images.wall.hardWall,
+        wall: images.wall.wall,
+      },
+      player: {
+        playerSprite: images.player.playerSprite,
+      },
+      enemies: images.enemies,
+      powerUps: images.powerUps,
+      door: {
+        door: images.door,
+      },
+    };
   }
 
   /**
@@ -72,40 +91,52 @@ export class LayoutEditor extends Layout {
     this.itemCtx.clearRect(0, 0, CANVAS.width, CANVAS.height);
 
     let i = 0;
-    const temp: { [key: string]: HTMLImageElement } = images.powerUps;
-    Object.keys(temp).forEach((imageName) => {
-      this.items[imageName] = {
-        x: i * MAP.tile.size,
-        y: 7,
-        width: MAP.tile.size,
-        height: MAP.tile.size,
-        active: false,
-      };
-      this.itemCtx.drawImage(
-        temp[imageName],
-        i * MAP.tile.size,
-        7,
-        MAP.tile.size,
-        MAP.tile.size,
-      );
-      i++;
+
+    Object.keys(this.filteredImages).forEach((key) => {
+      Object.keys(this.filteredImages[key]).forEach((innerKey) => {
+        this.items[innerKey] = {
+          x: i * MAP.tile.size + this.itemOffset,
+          y: 7,
+          width: MAP.tile.size,
+          height: MAP.tile.size,
+          multiple: innerKey === "door" || innerKey === "player" ? false : true,
+        };
+        this.itemCtx.drawImage(
+          this.filteredImages[key][innerKey],
+          0,
+          0,
+          16,
+          16,
+          i * MAP.tile.size + this.itemOffset,
+          7,
+          MAP.tile.size,
+          MAP.tile.size,
+        );
+        i++;
+      });
     });
+
+    // debugger
     this.handleItemsClick();
     this.handleCanvasClick();
   }
 
   handleItemsClick() {
     const itemCanvasRect = this.itemCanvas.getBoundingClientRect();
-    const mouseX = mouse.itemX - itemCanvasRect.left;
-    const mouseY = mouse.itemY - itemCanvasRect.top;
+
+    const x = clicks.item.x - itemCanvasRect.left;
+    const y = clicks.item.y - itemCanvasRect.top;
+
+    // Bitwise operator trick to perform flooring operation
+    this.activeItem = Math.abs(~~(x / MAP.tile.size)) + 1;
 
     // Check which item was clicked
     Object.keys(this.items).forEach((item) => {
       if (
-        mouseX >= this.items[item].x &&
-        mouseX <= this.items[item].x + this.items[item].width &&
-        mouseY >= this.items[item].y &&
-        mouseY <= this.items[item].y + this.items[item].height
+        x >= this.items[item].x &&
+        x <= this.items[item].x + this.items[item].width &&
+        y >= this.items[item].y &&
+        y <= this.items[item].y + this.items[item].height
       ) {
         this.itemCtx.strokeStyle = "green";
         this.itemCtx.lineWidth = 3;
@@ -115,7 +146,6 @@ export class LayoutEditor extends Layout {
           this.items[item].width,
           this.items[item].height,
         );
-        this.items[item].active = true;
       }
     });
   }
@@ -123,11 +153,19 @@ export class LayoutEditor extends Layout {
   handleCanvasClick() {
     const canvasRect = this.canvas.getBoundingClientRect();
 
-    // Bitwise operator trick to perform flooring operation
-    const x = Math.abs(~~((mouse.canvasX - canvasRect.left) / MAP.tile.size));
-    const y = Math.abs(~~((mouse.canvasY - canvasRect.top) / MAP.tile.size));
+    const [mouseX, mouseY] = [...clicks.canvas];
+    const x = Math.abs(~~((mouseX - canvasRect.left) / MAP.tile.size));
+    const y = Math.abs(~~((mouseY - canvasRect.top) / MAP.tile.size));
 
-    // TODO:  change value based on currently selected item from itembar
-    this.mapData.tiles[x][y] = 2;
+    // Add selceted item at clicked position excluding border walls on canvas
+    if (
+      x > 0 &&
+      x < this.mapData.width - 1 &&
+      y > 0 &&
+      y < this.mapData.height - 1
+    ) {
+      this.mapData.tiles[x][y] = this.activeItem;
+    }
+    clicks.canvas.clear();
   }
 }

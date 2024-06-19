@@ -1,7 +1,6 @@
 import { MAP } from "../constants/map";
-import Player from "./Player";
-import { CANVAS } from "../constants/canvas";
 import { images } from "../image/preload";
+import { Items } from "../enums/items";
 
 export type MapData = {
   width: number;
@@ -25,37 +24,88 @@ export class Layout {
    * Draw layout on canvas
    */
   draw() {
-    this.ctx.drawImage(this.img, this.x, this.y, MAP.tile.size, MAP.tile.size);
+    this.ctx.drawImage(
+      this.img,
+      0,
+      0,
+      15,
+      16,
+      this.x,
+      this.y,
+      MAP.tile.size,
+      MAP.tile.size,
+    );
   }
 
   /**
    * Renders map from json data
    */
-  renderMap(player: Player) {
+  // renderMap(player: Player) {
+  renderMap() {
     for (let y = 0; y < this.mapData.height; y++) {
       for (let x = 0; x < this.mapData.width; x++) {
         const tileType = this.mapData.tiles[x][y];
 
+        // TODO: Refactor this swtich statement
         switch (tileType) {
-          case 0:
+          case Items.Empty:
             continue;
-          case 1:
+          case Items.HardWall:
             this.img = images.wall.hardWall;
             break;
-          case 2:
+          case Items.Wall:
             this.img = images.wall.wall;
+            break;
+          case Items.Player:
+            this.img = images.player.playerSprite;
+            break;
+          case Items.Ballom:
+            this.img = images.enemies.ballomSprite;
+            break;
+          case Items.Dahl:
+            this.img = images.enemies.dahlSprite;
+            break;
+          case Items.Minvo:
+            this.img = images.enemies.minvoSprite;
+            break;
+          case Items.Onil:
+            this.img = images.enemies.onilSprite;
+            break;
+          case Items.Ovape:
+            this.img = images.enemies.ovapeSprite;
+            break;
+          case Items.Pass:
+            this.img = images.enemies.passSprite;
+            break;
+          case Items.Pontan:
+            this.img = images.enemies.pontanSprite;
+            break;
+          case Items.BombUp:
+            this.img = images.powerUps.bombUp;
+            break;
+          case Items.FireUp:
+            this.img = images.powerUps.fireUp;
+            break;
+          case Items.FlamePass:
+            this.img = images.powerUps.flamePass;
+            break;
+          case Items.RemoteControl:
+            this.img = images.powerUps.remoteControl;
+            break;
+          case Items.SpeedUp:
+            this.img = images.powerUps.speedUp;
+            break;
+          case Items.WallPass:
+            this.img = images.powerUps.wallPass;
+            break;
+          case Items.Door:
+            this.img = images.door;
             break;
           default:
             break;
         }
 
-        // Move map
-        // FIX: Still not working
-        if (player.x >= CANVAS.width / 2) {
-          this.x = (x - 1) * MAP.tile.size;
-        } else {
-          this.x = x * MAP.tile.size;
-        }
+        this.x = x * MAP.tile.size;
         this.y = y * MAP.tile.size;
         this.draw();
       }

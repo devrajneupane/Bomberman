@@ -7,11 +7,9 @@ export const keys = {
   space: false,
 };
 
-export const mouse = {
-  itemX: 0,
-  itemY: 0,
-  canvasX: 0,
-  canvasY: 0,
+export const clicks = {
+  item: { x: 0, y: 0 },
+  canvas: new Set<number>(),
 };
 
 const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
@@ -65,11 +63,10 @@ document.addEventListener("keyup", () => {
 });
 
 itemCanvas.addEventListener("click", (event: MouseEvent) => {
-  mouse.itemX = event.x;
-  mouse.itemY = event.y;
+  clicks.item.x = event.x;
+  clicks.item.y = event.y;
 });
 
 canvas.addEventListener("click", (event: MouseEvent) => {
-  mouse.canvasX = event.x;
-  mouse.canvasY = event.y;
+  clicks.canvas.add(event.x).add(event.y);
 });

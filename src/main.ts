@@ -21,10 +21,10 @@ function animate() {
   ctx.clearRect(player.offsetX, 0, CANVAS.width, CANVAS.height);
   ctx.fillRect(-player.offsetX, 0, CANVAS.width, CANVAS.height);
 
-  layout.renderMap(player);
+  layout.renderMap();
   layoutEditor.drawGrid();
   layoutEditor.itemBar();
-  player.draw();
+  // player.draw();
   requestAnimationFrame(animate);
 }
 
