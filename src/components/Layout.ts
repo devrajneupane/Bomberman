@@ -13,7 +13,7 @@ export class Layout {
   y: number = 0;
   mapData: MapData;
   ctx: CanvasRenderingContext2D;
-  img: HTMLImageElement = images.wall.hardWall;
+  img: HTMLImageElement = images.wall.concreteWall;
 
   constructor(mapData: MapData, ctx: CanvasRenderingContext2D) {
     this.mapData = mapData;
@@ -40,7 +40,6 @@ export class Layout {
   /**
    * Renders map from json data
    */
-  // renderMap(player: Player) {
   renderMap() {
     for (let y = 0; y < this.mapData.height; y++) {
       for (let x = 0; x < this.mapData.width; x++) {
@@ -50,11 +49,11 @@ export class Layout {
         switch (tileType) {
           case Items.Empty:
             continue;
-          case Items.HardWall:
-            this.img = images.wall.hardWall;
+          case Items.concreteWall:
+            this.img = images.wall.concreteWall;
             break;
-          case Items.Wall:
-            this.img = images.wall.wall;
+          case Items.brickWall:
+            this.img = images.wall.brickWall;
             break;
           case Items.Player:
             this.img = images.player.playerSprite;

@@ -1,4 +1,4 @@
-import { clicks } from "../input/input";
+import { clicks, keys } from "../input/input";
 import { images } from "../image/preload";
 import { Layout, MapData } from "./Layout";
 import { MAP } from "../constants/map";
@@ -21,6 +21,8 @@ export class LayoutEditor extends Layout {
   activeItem: number;
   filteredImages: { [key: string]: { [key: string]: HTMLImageElement } };
   itemOffset: number = 0;
+  offsetX: number = 0;
+  offsetY: number = 0;
 
   constructor(
     mapData: MapData,
@@ -38,8 +40,8 @@ export class LayoutEditor extends Layout {
     this.activeItem = Items.Empty;
     this.filteredImages = {
       wall: {
-        hardWall: images.wall.hardWall,
-        wall: images.wall.wall,
+        hardWall: images.wall.concreteWall,
+        wall: images.wall.brickWall,
       },
       player: {
         playerSprite: images.player.playerSprite,
@@ -81,6 +83,14 @@ export class LayoutEditor extends Layout {
       this.ctx.strokeStyle = "#fff";
       this.ctx.stroke();
     }
+
+    if (keys.left) {
+      this.moveLeft();
+      keys.left = false;
+    } else if (keys.right) {
+      this.moveRight();
+      keys.right = false;
+    }
   }
 
   itemBar(): void {
@@ -116,7 +126,6 @@ export class LayoutEditor extends Layout {
       });
     });
 
-    // debugger
     this.handleItemsClick();
     this.handleCanvasClick();
   }
@@ -153,8 +162,17 @@ export class LayoutEditor extends Layout {
   handleCanvasClick() {
     const canvasRect = this.canvas.getBoundingClientRect();
 
-    const [mouseX, mouseY] = [...clicks.canvas];
-    const x = Math.abs(~~((mouseX - canvasRect.left) / MAP.tile.size));
+    let tmp =
+      clicks.canvasRight.size === 0 ? clicks.canvas : clicks.canvasRight;
+    const [mouseX, mouseY] = [...tmp];
+    const x = Math.abs(
+      ~~(
+        (mouseX +
+          Math.floor(this.offsetX / (MAP.tile.size * 2)) -
+          canvasRect.left) /
+        MAP.tile.size
+      ),
+    );
     const y = Math.abs(~~((mouseY - canvasRect.top) / MAP.tile.size));
 
     // Add selceted item at clicked position excluding border walls on canvas
@@ -164,8 +182,36 @@ export class LayoutEditor extends Layout {
       y > 0 &&
       y < this.mapData.height - 1
     ) {
-      this.mapData.tiles[x][y] = this.activeItem;
+      if (tmp === clicks.canvasRight) {
+        this.mapData.tiles[x][y] = Items.Empty;
+      } else {
+        this.mapData.tiles[x][y] = this.activeItem;
+      }
     }
-    clicks.canvas.clear();
+    tmp.clear();
+  }
+
+  /**
+   * Move Editor area left
+   */
+  moveLeft() {
+    if (this.offsetX < 0) {
+      this.ctx.translate(5, 0);
+      this.offsetX += 5;
+    }
+    // console.log(this.offsetX);
+  }
+
+  /**
+   * Move Editor area right
+   */
+  moveRight() {
+    if (
+      this.offsetX > -(this.mapData.width * MAP.tile.size - CANVAS.width - 1)
+    ) {
+      this.ctx.translate(-5, 0);
+      this.offsetX -= 5;
+    }
+    // console.log(this.offsetX);
   }
 }

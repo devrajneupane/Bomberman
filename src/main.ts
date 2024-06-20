@@ -18,8 +18,9 @@ const layoutEditor = new LayoutEditor(mapData, canvas, ctx);
 
 function animate() {
   ctx.fillStyle = "#1f8b00";
-  ctx.clearRect(player.offsetX, 0, CANVAS.width, CANVAS.height);
-  ctx.fillRect(-player.offsetX, 0, CANVAS.width, CANVAS.height);
+  // ctx.clearRect(player.offsetX || layoutEditor.offsetX, 0, CANVAS.width, CANVAS.height);
+  ctx.clearRect(0, 0, CANVAS.width, CANVAS.height);
+  ctx.fillRect(-player.offsetX || -layoutEditor.offsetX, 0, CANVAS.width, CANVAS.height);
 
   layout.renderMap();
   layoutEditor.drawGrid();

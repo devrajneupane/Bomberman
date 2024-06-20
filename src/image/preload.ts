@@ -29,9 +29,9 @@ import pontanSprite from "/game/sprites/enemies/pontan.png";
 
 export const images = {
   wall: {
-    wall: createImageElement(wall),
-    hardWall: createImageElement(hardWall),
-    wallExplosionSprite: createImageElement(wallExplosionSprite),
+    brickWall: createImageElement(wall),
+    concreteWall: createImageElement(hardWall),
+    brickWallExplosionSprite: createImageElement(wallExplosionSprite),
   },
   player: {
     playerSprite: createImageElement(playerSprite),

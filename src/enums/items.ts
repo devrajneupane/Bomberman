@@ -2,8 +2,8 @@ export enum Items {
   Empty,
 
   // Walls
-  HardWall,
-  Wall,
+  concreteWall,
+  brickWall,
 
   // Player ??
   Player,

@@ -118,8 +118,10 @@ export default class Player {
     if (this.x + this.width > this.mapData.width * MAP.tile.size) {
       this.x = this.mapData.width * MAP.tile.size - this.width;
     }
-    // TODO: Do not hardcode value, make `this.offsetX` dpends on width of `mapData`
-    if (this.x > CANVAS.width / 2 && this.offsetX > -460) {
+    if (
+      this.x > CANVAS.width / 2 &&
+      this.offsetX > -(this.mapData.width * MAP.tile.size - CANVAS.width - 1)
+    ) {
       this.ctx.translate(-this.speed, 0);
       this.offsetX -= this.speed;
     }
