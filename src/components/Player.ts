@@ -4,6 +4,7 @@ import { DIRECTION_MAP } from "../constants/sprites";
 import { keys } from "../input/input";
 import { images } from "../image/preload";
 import { MapData } from "./Layout";
+import { coordinateCollision } from "../utils/collision";
 
 export default class Player {
   x: number;
@@ -22,21 +23,22 @@ export default class Player {
   speed: number;
   offsetX: number;
   offsetY: number;
+  playerOffset: number = 10;
   mapData: MapData;
   ctx: CanvasRenderingContext2D;
 
   constructor(mapData: MapData, ctx: CanvasRenderingContext2D) {
-    this.x = 0;
-    this.y = 0;
-    this.width = MAP.tile.size;
-    this.height = MAP.tile.size;
+    this.x = MAP.tile.size + this.playerOffset;
+    this.y = MAP.tile.size + this.playerOffset;
+    this.width = MAP.tile.size - this.playerOffset;
+    this.height = MAP.tile.size - this.playerOffset;
     this.ctx = ctx;
 
     this.sx = 0;
     this.sy = 0;
 
     this.spriteCounter = 0;
-    this.speed = 5;
+    this.speed = 2;
     this.img = images.player.playerSprite;
 
     this.directions = ["left", "right", "up", "down", "idle"];
@@ -83,6 +85,8 @@ export default class Player {
       this.width,
       this.height,
     );
+    this.ctx.strokeStyle = "red";
+    this.ctx.strokeRect(this.x, this.y, this.width, this.height);
   }
 
   /**
@@ -100,11 +104,12 @@ export default class Player {
    * Move player left
    */
   moveLeft() {
+    if (coordinateCollision(this, "left")) return;
     this.x -= this.speed;
-    if (this.x < 0) {
-      this.x = 0;
+    if (this.x < MAP.tile.size) {
+      this.x = MAP.tile.size;
     }
-    if (this.x < CANVAS.width / 2 && this.offsetX < 0) {
+    if (this.x <= CANVAS.width / 2 && this.offsetX < 0) {
       this.ctx.translate(this.speed, 0);
       this.offsetX += this.speed;
     }
@@ -114,9 +119,13 @@ export default class Player {
    * Move player right
    */
   moveRight() {
+    if (coordinateCollision(this, "right")) return;
     this.x += this.speed;
-    if (this.x + this.width > this.mapData.width * MAP.tile.size) {
-      this.x = this.mapData.width * MAP.tile.size - this.width;
+    if (
+      this.x + this.width >
+      this.mapData.width * MAP.tile.size - MAP.tile.size
+    ) {
+      this.x = this.mapData.width * MAP.tile.size - this.width - MAP.tile.size;
     }
     if (
       this.x > CANVAS.width / 2 &&
@@ -131,9 +140,10 @@ export default class Player {
    * Move player up
    */
   moveUp() {
+    if (coordinateCollision(this, "top")) return;
     this.y -= this.speed;
-    if (this.y < 0) {
-      this.y = 0;
+    if (this.y < MAP.tile.size) {
+      this.y = MAP.tile.size;
     }
   }
 
@@ -141,9 +151,14 @@ export default class Player {
    * Move player down
    */
   moveDown() {
+    if (coordinateCollision(this, "bottom")) return;
     this.y += this.speed;
-    if (this.y + this.height > CANVAS.height) {
-      this.y = CANVAS.height - this.height;
+    if (
+      this.y + this.height >
+      this.mapData.height * MAP.tile.size - MAP.tile.size
+    ) {
+      this.y =
+        this.mapData.height * MAP.tile.size - this.height - MAP.tile.size;
     }
   }
 }

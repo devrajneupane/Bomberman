@@ -23,9 +23,9 @@ function animate() {
   ctx.fillRect(-player.offsetX || -layoutEditor.offsetX, 0, CANVAS.width, CANVAS.height);
 
   layout.renderMap();
-  layoutEditor.drawGrid();
-  layoutEditor.itemBar();
-  // player.draw();
+  // layoutEditor.drawGrid();
+  // layoutEditor.itemBar();
+  player.draw();
   requestAnimationFrame(animate);
 }
 

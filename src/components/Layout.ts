@@ -11,6 +11,8 @@ export type MapData = {
 export class Layout {
   x: number = 0;
   y: number = 0;
+  width: number = MAP.tile.size;
+  height: number = MAP.tile.size;
   mapData: MapData;
   ctx: CanvasRenderingContext2D;
   img: HTMLImageElement = images.wall.concreteWall;
@@ -35,6 +37,7 @@ export class Layout {
       MAP.tile.size,
       MAP.tile.size,
     );
+    this.ctx.strokeRect(this.x, this.y, this.width, this.height)
   }
 
   /**
