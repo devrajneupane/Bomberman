@@ -20,7 +20,7 @@ export class LayoutEditor extends Layout {
   itemCtx: CanvasRenderingContext2D;
   activeItem: number;
   filteredImages: { [key: string]: { [key: string]: HTMLImageElement } };
-  itemOffset: number = 0;
+  itemOffset: number = 10;
   offsetX: number = 0;
   offsetY: number = 0;
 
@@ -93,6 +93,9 @@ export class LayoutEditor extends Layout {
     }
   }
 
+  /**
+   * Draw items on item canvas
+   */
   itemBar(): void {
     this.itemCanvas.width = CANVAS.width;
     this.itemCanvas.height = CANVAS.height / 10;
@@ -162,31 +165,24 @@ export class LayoutEditor extends Layout {
   handleCanvasClick() {
     const canvasRect = this.canvas.getBoundingClientRect();
 
-    let tmp =
-      clicks.canvasRight.size === 0 ? clicks.canvas : clicks.canvasRight;
+    // Check if left or right click was performed
+    let tmp = clicks.canvasRight.size === 0 ? clicks.canvas : clicks.canvasRight;
     const [mouseX, mouseY] = [...tmp];
-    const x = Math.abs(
-      ~~(
-        (mouseX +
-          Math.floor(this.offsetX / (MAP.tile.size * 2)) -
-          canvasRect.left) /
-        MAP.tile.size
-      ),
-    );
+
+    // Calculate clicked position on canvas
+    const x = Math.abs(~~((mouseX - this.offsetX - canvasRect.left) / MAP.tile.size));
     const y = Math.abs(~~((mouseY - canvasRect.top) / MAP.tile.size));
 
-    // Add selceted item at clicked position excluding border walls on canvas
+    // Add selected item at clicked position excluding border walls on canvas
     if (
       x > 0 &&
       x < this.mapData.width - 1 &&
       y > 0 &&
       y < this.mapData.height - 1
     ) {
-      if (tmp === clicks.canvasRight) {
-        this.mapData.tiles[x][y] = Items.Empty;
-      } else {
-        this.mapData.tiles[x][y] = this.activeItem;
-      }
+      // Remove item if right click was performed
+      this.mapData.tiles[x][y] =
+        tmp === clicks.canvasRight ? Items.Empty : this.activeItem;
     }
     tmp.clear();
   }
@@ -199,7 +195,7 @@ export class LayoutEditor extends Layout {
       this.ctx.translate(5, 0);
       this.offsetX += 5;
     }
-    // console.log(this.offsetX);
+    keys.left = false;
   }
 
   /**
@@ -212,6 +208,6 @@ export class LayoutEditor extends Layout {
       this.ctx.translate(-5, 0);
       this.offsetX -= 5;
     }
-    // console.log(this.offsetX);
+    keys.right = false;
   }
 }

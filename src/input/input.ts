@@ -63,7 +63,7 @@ document.addEventListener("keyup", () => {
   keys.up = false;
   keys.down = false;
   keys.enter = false;
-  keys.space = false;
+  // keys.space = false;
 });
 
 // TODO: make click event listner only active for layout editor
@@ -80,7 +80,6 @@ canvas.addEventListener("mousedown", (event: MouseEvent) => {
   if (event.button === 0) {
     isMouseDown = true;
     clicks.canvas.add(event.x).add(event.y);
-    console.log(event)
   }
 });
 

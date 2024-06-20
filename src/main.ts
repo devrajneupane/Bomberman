@@ -5,6 +5,7 @@ import Player from "./components/Player";
 import { Layout } from "./components/Layout";
 import mapData from "./tilemap.json";
 import { LayoutEditor } from "./components/LayoutEditor";
+import { keys } from "./input/input";
 
 const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
 const ctx = canvas.getContext("2d")!;
@@ -23,9 +24,16 @@ function animate() {
   ctx.fillRect(-player.offsetX || -layoutEditor.offsetX, 0, CANVAS.width, CANVAS.height);
 
   layout.renderMap();
-  layoutEditor.drawGrid();
-  layoutEditor.itemBar();
-  // player.draw();
+
+  if (!keys.space) {
+    layoutEditor.drawGrid();
+    layoutEditor.itemBar();
+  } else {
+  layout.renderMap();
+    player.draw();
+    layoutEditor.itemCanvas.style.display = "none";
+  }
+
   requestAnimationFrame(animate);
 }
 
