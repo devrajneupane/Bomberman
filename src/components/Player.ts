@@ -4,6 +4,7 @@ import { DIRECTION_MAP } from "../constants/sprites";
 import { keys } from "../input/input";
 import { images } from "../image/preload";
 import { MapData } from "./Layout";
+import Bomb from "./Bomb";
 
 export default class Player {
   x: number;
@@ -23,6 +24,8 @@ export default class Player {
   offsetX: number;
   offsetY: number;
   mapData: MapData;
+  bombActive: boolean = false;
+  bomb: Bomb;
   ctx: CanvasRenderingContext2D;
 
   constructor(mapData: MapData, ctx: CanvasRenderingContext2D) {
@@ -45,6 +48,8 @@ export default class Player {
     this.offsetX = 0;
     this.offsetY = 0;
     this.mapData = mapData;
+
+    this.bomb = new Bomb(this.x, this.y, this.ctx);
   }
 
   /**
@@ -56,20 +61,22 @@ export default class Player {
 
     if (keys.left) {
       this.direction = this.directions[0];
-      this.frameBuffer();
       this.moveLeft();
     } else if (keys.right) {
       this.direction = this.directions[1];
-      this.frameBuffer();
       this.moveRight();
     } else if (keys.up) {
       this.direction = this.directions[2];
-      this.frameBuffer();
       this.moveUp();
     } else if (keys.down) {
       this.direction = this.directions[3];
       this.moveDown();
-      this.frameBuffer();
+    } else if (keys.keyX && !this.bombActive) {
+      this.dropBomb();
+    }
+
+    if (this.bombActive) {
+      this.bomb.draw();
     }
 
     this.ctx.drawImage(
@@ -100,6 +107,7 @@ export default class Player {
    * Move player left
    */
   moveLeft() {
+    this.frameBuffer();
     this.x -= this.speed;
     if (this.x < 0) {
       this.x = 0;
@@ -114,6 +122,7 @@ export default class Player {
    * Move player right
    */
   moveRight() {
+    this.frameBuffer();
     this.x += this.speed;
     if (this.x + this.width > this.mapData.width * MAP.tile.size) {
       this.x = this.mapData.width * MAP.tile.size - this.width;
@@ -131,6 +140,7 @@ export default class Player {
    * Move player up
    */
   moveUp() {
+    this.frameBuffer();
     this.y -= this.speed;
     if (this.y < 0) {
       this.y = 0;
@@ -141,9 +151,22 @@ export default class Player {
    * Move player down
    */
   moveDown() {
+    this.frameBuffer();
     this.y += this.speed;
     if (this.y + this.height > CANVAS.height) {
       this.y = CANVAS.height - this.height;
     }
+  }
+
+  /**
+   * Drop bomb at current position
+   */
+  dropBomb() {
+    this.bomb = new Bomb(this.x, this.y, this.ctx);
+    this.bombActive = true;
+
+    setTimeout(() => {
+      this.bombActive = false;
+    }, 2500);
   }
 }
