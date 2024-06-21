@@ -5,6 +5,7 @@ import { keys } from "../input/input";
 import { images } from "../image/preload";
 import { MapData } from "./Layout";
 import Bomb from "./Bomb";
+import { Point } from "../types/point";
 
 export default class Player {
   x: number;
@@ -24,7 +25,6 @@ export default class Player {
   offsetX: number;
   offsetY: number;
   mapData: MapData;
-  bombActive: boolean = false;
   bomb: Bomb;
   ctx: CanvasRenderingContext2D;
 
@@ -49,7 +49,7 @@ export default class Player {
     this.offsetY = 0;
     this.mapData = mapData;
 
-    this.bomb = new Bomb(this.x, this.y, this.ctx);
+    this.bomb = new Bomb(this.calculateCoordinate(), this.ctx);
   }
 
   /**
@@ -71,11 +71,11 @@ export default class Player {
     } else if (keys.down) {
       this.direction = this.directions[3];
       this.moveDown();
-    } else if (keys.keyX && !this.bombActive) {
+    } else if (keys.keyX && !this.bomb.bombActive) {
       this.dropBomb();
     }
 
-    if (this.bombActive) {
+    if (this.bomb.bombActive) {
       this.bomb.draw();
     }
 
@@ -159,14 +159,24 @@ export default class Player {
   }
 
   /**
+   * Calculate coordinate of player in map
+   */
+  calculateCoordinate(): Point {
+    const x = Math.floor((this.x + this.width / 2) / MAP.tile.size);
+    const y = Math.floor((this.y + this.height / 2) / MAP.tile.size);
+    return { x: x, y: y };
+  }
+
+  /**
    * Drop bomb at current position
    */
   dropBomb() {
-    this.bomb = new Bomb(this.x, this.y, this.ctx);
-    this.bombActive = true;
+    this.bomb = new Bomb(this.calculateCoordinate(), this.ctx);
+    this.bomb.bombActive = true;
 
     setTimeout(() => {
-      this.bombActive = false;
+      this.bomb.calculateExplosion()
+      // this.bombActive = false;
     }, 2500);
   }
 }
