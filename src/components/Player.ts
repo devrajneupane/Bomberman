@@ -1,10 +1,11 @@
-import { CANVAS } from "../constants/canvas";
-import { MAP } from "../constants/map";
-import { DIRECTION_MAP } from "../constants/sprites";
-import { keys } from "../input/input";
-import { images } from "../image/preload";
 import { MapData } from "./Layout";
-import { coordinateCollision } from "../utils/collision";
+import { keys } from "../input/input";
+import { MAP } from "../constants/map";
+import { images } from "../image/preload";
+import { CANVAS } from "../constants/canvas";
+import { isCollided } from "../utils/collision";
+import { Direction } from "../enums/Direction";
+import { DIRECTION_MAP } from "../constants/sprites";
 
 export default class Player {
   x: number;
@@ -13,8 +14,7 @@ export default class Player {
   height: number;
   sx: number;
   sy: number;
-  direction: string;
-  directions: string[];
+  direction: Direction;
   spriteCounter: number;
   img: HTMLImageElement;
   elaspedFrame: number = 0;
@@ -23,7 +23,7 @@ export default class Player {
   speed: number;
   offsetX: number;
   offsetY: number;
-  playerOffset: number = 10;
+  playerOffset: number = 15;
   mapData: MapData;
   ctx: CanvasRenderingContext2D;
 
@@ -38,11 +38,10 @@ export default class Player {
     this.sy = 0;
 
     this.spriteCounter = 0;
-    this.speed = 2;
+    this.speed = 3;
     this.img = images.player.playerSprite;
 
-    this.directions = ["left", "right", "up", "down", "idle"];
-    this.direction = this.directions[0];
+    this.direction = Direction.Right;
     this.frameIndexes = DIRECTION_MAP[this.direction];
     this.offsetX = 0;
     this.offsetY = 0;
@@ -57,19 +56,19 @@ export default class Player {
     this.currentFrame = (this.currentFrame + 1) % this.frameIndexes.length;
 
     if (keys.left) {
-      this.direction = this.directions[0];
+      this.direction = Direction.Left;
       this.frameBuffer();
       this.moveLeft();
     } else if (keys.right) {
-      this.direction = this.directions[1];
+      this.direction = Direction.Right;
       this.frameBuffer();
       this.moveRight();
     } else if (keys.up) {
-      this.direction = this.directions[2];
+      this.direction = Direction.Up;
       this.frameBuffer();
       this.moveUp();
     } else if (keys.down) {
-      this.direction = this.directions[3];
+      this.direction = Direction.Down;
       this.moveDown();
       this.frameBuffer();
     }
@@ -95,7 +94,7 @@ export default class Player {
   frameBuffer() {
     const frameIndex = this.frameIndexes[this.currentFrame];
     this.frameIndexes = DIRECTION_MAP[this.direction];
-    if (this.elaspedFrame % 4 === 0) {
+    if (this.elaspedFrame % 8 === 0) {
       this.sx = frameIndex * 16;
     }
   }
@@ -104,7 +103,7 @@ export default class Player {
    * Move player left
    */
   moveLeft() {
-    if (coordinateCollision(this, "left")) return;
+    if (isCollided(this, Direction.Left)) return;
     this.x -= this.speed;
     if (this.x < MAP.tile.size) {
       this.x = MAP.tile.size;
@@ -119,7 +118,7 @@ export default class Player {
    * Move player right
    */
   moveRight() {
-    if (coordinateCollision(this, "right")) return;
+    if (isCollided(this, Direction.Right)) return;
     this.x += this.speed;
     if (
       this.x + this.width >
@@ -140,7 +139,7 @@ export default class Player {
    * Move player up
    */
   moveUp() {
-    if (coordinateCollision(this, "top")) return;
+    if (isCollided(this, Direction.Up)) return;
     this.y -= this.speed;
     if (this.y < MAP.tile.size) {
       this.y = MAP.tile.size;
@@ -151,7 +150,7 @@ export default class Player {
    * Move player down
    */
   moveDown() {
-    if (coordinateCollision(this, "bottom")) return;
+    if (isCollided(this, Direction.Down)) return;
     this.y += this.speed;
     if (
       this.y + this.height >
