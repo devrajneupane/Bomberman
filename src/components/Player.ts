@@ -84,8 +84,6 @@ export default class Player {
       this.width,
       this.height,
     );
-    this.ctx.strokeStyle = "red";
-    this.ctx.strokeRect(this.x, this.y, this.width, this.height);
   }
 
   /**
@@ -120,11 +118,8 @@ export default class Player {
   moveRight() {
     if (isCollided(this, Direction.Right)) return;
     this.x += this.speed;
-    if (
-      this.x + this.width >
-      this.mapData.width * MAP.tile.size - MAP.tile.size
-    ) {
-      this.x = this.mapData.width * MAP.tile.size - this.width - MAP.tile.size;
+    if ( this.x + this.width > (this.mapData.width-1) * MAP.tile.size) {
+      this.x = (this.mapData.width - 1) * MAP.tile.size - this.width;
     }
     if (
       this.x > CANVAS.width / 2 &&
@@ -153,11 +148,8 @@ export default class Player {
     if (isCollided(this, Direction.Down)) return;
     this.y += this.speed;
     if (
-      this.y + this.height >
-      this.mapData.height * MAP.tile.size - MAP.tile.size
-    ) {
-      this.y =
-        this.mapData.height * MAP.tile.size - this.height - MAP.tile.size;
+      this.y + this.height > (this.mapData.height-1) * MAP.tile.size) {
+      this.y = (this.mapData.height - 1) * MAP.tile.size - this.height;
     }
   }
 }
