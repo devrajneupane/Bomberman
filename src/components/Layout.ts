@@ -28,7 +28,7 @@ export class Layout {
       this.img,
       0,
       0,
-      15,
+      16,
       16,
       this.x,
       this.y,
@@ -43,7 +43,10 @@ export class Layout {
   renderMap() {
     for (let y = 0; y < this.mapData.height; y++) {
       for (let x = 0; x < this.mapData.width; x++) {
-        const tileType = this.mapData.tiles[x][y];
+        const tileType =
+          (x & 1) === 0 && (y & 1) === 0
+            ? Items.concreteWall
+            : this.mapData.tiles[x][y];
 
         // TODO: Refactor this swtich statement
         switch (tileType) {
