@@ -1,9 +1,11 @@
-import { CANVAS } from "../constants/canvas";
-import { MAP } from "../constants/map";
-import { DIRECTION_MAP } from "../constants/sprites";
-import { keys } from "../input/input";
-import { images } from "../image/preload";
 import { MapData } from "./Layout";
+import { keys } from "../input/input";
+import { MAP } from "../constants/map";
+import { images } from "../image/preload";
+import { CANVAS } from "../constants/canvas";
+import { isCollided } from "../utils/collision";
+import { Direction } from "../enums/Direction";
+import { DIRECTION_MAP } from "../constants/sprites";
 
 export default class Player {
   x: number;
@@ -12,8 +14,7 @@ export default class Player {
   height: number;
   sx: number;
   sy: number;
-  direction: string;
-  directions: string[];
+  direction: Direction;
   spriteCounter: number;
   img: HTMLImageElement;
   elaspedFrame: number = 0;
@@ -22,25 +23,25 @@ export default class Player {
   speed: number;
   offsetX: number;
   offsetY: number;
+  playerOffset: number = 15;
   mapData: MapData;
   ctx: CanvasRenderingContext2D;
 
   constructor(mapData: MapData, ctx: CanvasRenderingContext2D) {
-    this.x = 0;
-    this.y = 0;
-    this.width = MAP.tile.size;
-    this.height = MAP.tile.size;
+    this.x = MAP.tile.size + this.playerOffset;
+    this.y = MAP.tile.size + this.playerOffset;
+    this.width = MAP.tile.size - this.playerOffset;
+    this.height = MAP.tile.size - this.playerOffset;
     this.ctx = ctx;
 
     this.sx = 0;
     this.sy = 0;
 
     this.spriteCounter = 0;
-    this.speed = 5;
+    this.speed = 3;
     this.img = images.player.playerSprite;
 
-    this.directions = ["left", "right", "up", "down", "idle"];
-    this.direction = this.directions[0];
+    this.direction = Direction.Right;
     this.frameIndexes = DIRECTION_MAP[this.direction];
     this.offsetX = 0;
     this.offsetY = 0;
@@ -55,19 +56,19 @@ export default class Player {
     this.currentFrame = (this.currentFrame + 1) % this.frameIndexes.length;
 
     if (keys.left) {
-      this.direction = this.directions[0];
+      this.direction = Direction.Left;
       this.frameBuffer();
       this.moveLeft();
     } else if (keys.right) {
-      this.direction = this.directions[1];
+      this.direction = Direction.Right;
       this.frameBuffer();
       this.moveRight();
     } else if (keys.up) {
-      this.direction = this.directions[2];
+      this.direction = Direction.Up;
       this.frameBuffer();
       this.moveUp();
     } else if (keys.down) {
-      this.direction = this.directions[3];
+      this.direction = Direction.Down;
       this.moveDown();
       this.frameBuffer();
     }
@@ -91,7 +92,7 @@ export default class Player {
   frameBuffer() {
     const frameIndex = this.frameIndexes[this.currentFrame];
     this.frameIndexes = DIRECTION_MAP[this.direction];
-    if (this.elaspedFrame % 4 === 0) {
+    if (this.elaspedFrame % 8 === 0) {
       this.sx = frameIndex * 16;
     }
   }
@@ -100,11 +101,12 @@ export default class Player {
    * Move player left
    */
   moveLeft() {
+    if (isCollided(this, Direction.Left)) return;
     this.x -= this.speed;
-    if (this.x < 0) {
-      this.x = 0;
+    if (this.x < MAP.tile.size) {
+      this.x = MAP.tile.size;
     }
-    if (this.x < CANVAS.width / 2 && this.offsetX < 0) {
+    if (this.x <= CANVAS.width / 2 && this.offsetX < 0) {
       this.ctx.translate(this.speed, 0);
       this.offsetX += this.speed;
     }
@@ -114,9 +116,10 @@ export default class Player {
    * Move player right
    */
   moveRight() {
+    if (isCollided(this, Direction.Right)) return;
     this.x += this.speed;
-    if (this.x + this.width > this.mapData.width * MAP.tile.size) {
-      this.x = this.mapData.width * MAP.tile.size - this.width;
+    if ( this.x + this.width > (this.mapData.width-1) * MAP.tile.size) {
+      this.x = (this.mapData.width - 1) * MAP.tile.size - this.width;
     }
     if (
       this.x > CANVAS.width / 2 &&
@@ -131,9 +134,10 @@ export default class Player {
    * Move player up
    */
   moveUp() {
+    if (isCollided(this, Direction.Up)) return;
     this.y -= this.speed;
-    if (this.y < 0) {
-      this.y = 0;
+    if (this.y < MAP.tile.size) {
+      this.y = MAP.tile.size;
     }
   }
 
@@ -141,9 +145,11 @@ export default class Player {
    * Move player down
    */
   moveDown() {
+    if (isCollided(this, Direction.Down)) return;
     this.y += this.speed;
-    if (this.y + this.height > CANVAS.height) {
-      this.y = CANVAS.height - this.height;
+    if (
+      this.y + this.height > (this.mapData.height-1) * MAP.tile.size) {
+      this.y = (this.mapData.height - 1) * MAP.tile.size - this.height;
     }
   }
 }
