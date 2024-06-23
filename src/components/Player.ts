@@ -11,8 +11,7 @@ import Bomb from "./Bomb";
 import { MapData } from "./Layout";
 
 export default class Player {
-  x: number;
-  y: number;
+  position: Point;
   width: number;
   height: number;
   sx: number;
@@ -33,14 +32,16 @@ export default class Player {
   speed: number;
   offsetX: number;
   offsetY: number;
-  playerOffset: number = 15;
+  playerOffset: number = 10;
   mapData: MapData;
   bomb: Bomb;
   ctx: CanvasRenderingContext2D;
 
   constructor(mapData: MapData, ctx: CanvasRenderingContext2D) {
-    this.x = MAP.tile.size + this.playerOffset;
-    this.y = MAP.tile.size + this.playerOffset;
+    this.position = {
+      x: MAP.tile.size + this.playerOffset,
+      y: MAP.tile.size + this.playerOffset,
+    };
     this.width = MAP.tile.size - this.playerOffset;
     this.height = MAP.tile.size - this.playerOffset;
     this.ctx = ctx;
@@ -55,7 +56,7 @@ export default class Player {
     this.prevItem = Items.Empty;
 
     this.spriteCounter = 0;
-    this.speed = 5;
+    this.speed = 2;
     this.img = images.player.playerSprite;
 
     this.direction = Direction.Right;
@@ -105,8 +106,8 @@ export default class Player {
       this.sy,
       this.sWidth,
       this.sHeight,
-      this.x,
-      this.y,
+      this.position.x,
+      this.position.y,
       this.width,
       this.height,
     );
@@ -132,11 +133,11 @@ export default class Player {
   moveLeft() {
     if (isCollided(this, Direction.Left)) return;
     this.frameBuffer();
-    this.x -= this.speed;
-    if (this.x < MAP.tile.size) {
-      this.x = MAP.tile.size;
+    this.position.x -= this.speed;
+    if (this.position.x < MAP.tile.size) {
+      this.position.x = MAP.tile.size;
     }
-    if (this.x <= CANVAS.width / 2 && this.offsetX < 0) {
+    if (this.position.x <= CANVAS.width / 2 && this.offsetX < 0) {
       this.ctx.translate(this.speed, 0);
       this.offsetX += this.speed;
     }
@@ -149,12 +150,15 @@ export default class Player {
   moveRight() {
     if (isCollided(this, Direction.Right)) return;
     this.frameBuffer();
-    this.x += this.speed;
-    if (this.x + this.width > (this.mapData.width - 1) * MAP.tile.size) {
-      this.x = (this.mapData.width - 1) * MAP.tile.size - this.width;
+    this.position.x += this.speed;
+    if (
+      this.position.x + this.width >
+      (this.mapData.width - 1) * MAP.tile.size
+    ) {
+      this.position.x = (this.mapData.width - 1) * MAP.tile.size - this.width;
     }
     if (
-      this.x > CANVAS.width / 2 &&
+      this.position.x > CANVAS.width / 2 &&
       this.offsetX > -(this.mapData.width * MAP.tile.size - CANVAS.width - 1)
     ) {
       this.ctx.translate(-this.speed, 0);
@@ -169,9 +173,9 @@ export default class Player {
   moveUp() {
     if (isCollided(this, Direction.Up)) return;
     this.frameBuffer();
-    this.y -= this.speed;
-    if (this.y < MAP.tile.size) {
-      this.y = MAP.tile.size;
+    this.position.y -= this.speed;
+    if (this.position.y < MAP.tile.size) {
+      this.position.y = MAP.tile.size;
     }
     this.updateTile();
   }
@@ -182,9 +186,12 @@ export default class Player {
   moveDown() {
     if (isCollided(this, Direction.Down)) return;
     this.frameBuffer();
-    this.y += this.speed;
-    if (this.y + this.height > (this.mapData.height - 1) * MAP.tile.size) {
-      this.y = (this.mapData.height - 1) * MAP.tile.size - this.height;
+    this.position.y += this.speed;
+    if (
+      this.position.y + this.height >
+      (this.mapData.height - 1) * MAP.tile.size
+    ) {
+      this.position.y = (this.mapData.height - 1) * MAP.tile.size - this.height;
     }
     this.updateTile();
   }
@@ -193,8 +200,8 @@ export default class Player {
    * Calculate coordinate of player in map
    */
   calculateCoordinate(): Point {
-    const x = Math.floor((this.x + this.width / 2) / MAP.tile.size);
-    const y = Math.floor((this.y + this.height / 2) / MAP.tile.size);
+    const x = Math.floor((this.position.x + this.width / 2) / MAP.tile.size);
+    const y = Math.floor((this.position.y + this.height / 2) / MAP.tile.size);
     return { x: x, y: y };
   }
 
