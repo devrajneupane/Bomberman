@@ -5,6 +5,7 @@ import { Point } from "../types/point";
 import BombExplosion from "./BombExplosion";
 import { MapData } from "./Layout";
 import Player from "./Player";
+import Wall from "./Wall";
 
 export default class Bomb {
   position: Point;
@@ -23,7 +24,7 @@ export default class Bomb {
   mapData: MapData;
   img: HTMLImageElement;
   ctx: CanvasRenderingContext2D;
-  explosionArray: BombExplosion[];
+  explosionArray: BombExplosion[] | Wall[];
 
   constructor(player: Player, mapData: MapData, ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
@@ -64,13 +65,6 @@ export default class Bomb {
       this.width,
       this.height,
     );
-    this.ctx.strokeStyle = "red";
-    this.ctx.strokeRect(
-      this.position.x * MAP.tile.size,
-      this.position.y * MAP.tile.size,
-      this.width,
-      this.height,
-    );
     for (let explosion of this.explosionArray) {
       explosion.draw();
     }
@@ -80,8 +74,8 @@ export default class Bomb {
     const frameIndex = this.frameIndexes[this.currentFrame];
     if (this.elaspedFrame % 25 === 0) {
       this.sPosition.x = frameIndex * this.sWidth;
-      if (frameIndex === 2){
-        this.frameIndexes.reverse()
+      if (frameIndex === 2) {
+        this.frameIndexes.reverse();
       }
     }
   }
@@ -151,17 +145,24 @@ export default class Bomb {
           x: x * MAP.tile.size,
           y: y * MAP.tile.size,
         };
-        const leftExplosion = new BombExplosion(pos, img, this.ctx);
-        this.explosionArray.push(leftExplosion);
+        const bombExplosion = new BombExplosion(pos, img, this.ctx);
+        this.explosionArray.push(bombExplosion);
         break;
 
       case Items.brickWall:
-        // TODO: explode brick wall
-        this.mapData.tiles[x][y] = 0;
+        // Explode brick wall and reset its tile
+        const brickWall = new Wall(
+          { x: x * MAP.tile.size, y: y * MAP.tile.size },
+          images.wall.brickWallExplosionSprite,
+          this.ctx,
+        );
+        this.explosionArray.push(brickWall);
+        this.mapData.tiles[x][y] = Items.Empty;
         break;
 
       case Items.Player:
-        // TODO: explode player and reset statge or game over
+        // Explode player
+        // TODO: reset statge or game over
         this.player.img = images.player.playerDyingSprite;
         this.player.sHeight = 21;
         this.player.currentFrame = 0;
