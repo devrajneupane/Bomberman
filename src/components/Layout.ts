@@ -45,6 +45,7 @@ export class Layout {
   renderMap() {
     for (let y = 0; y < this.mapData.height; y++) {
       for (let x = 0; x < this.mapData.width; x++) {
+        // const tileType = this.mapData.tiles[x][y];
         const tileType =
           (x & 1) === 0 && (y & 1) === 0
             ? Items.concreteWall
@@ -61,8 +62,9 @@ export class Layout {
             this.img = images.wall.brickWall;
             break;
           case Items.Player:
-            this.img = images.player.playerSprite;
-            break;
+            // this.img = images.player.playerSprite;
+            // break;
+            continue;
           case Items.Ballom:
             this.img = images.enemies.ballomSprite;
             break;

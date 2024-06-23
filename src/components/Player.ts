@@ -1,11 +1,14 @@
-import { MapData } from "./Layout";
-import { keys } from "../input/input";
-import { MAP } from "../constants/map";
-import { images } from "../image/preload";
 import { CANVAS } from "../constants/canvas";
-import { isCollided } from "../utils/collision";
-import { Direction } from "../enums/Direction";
+import { MAP } from "../constants/map";
 import { DIRECTION_MAP } from "../constants/sprites";
+import { Direction } from "../enums/Direction";
+import { Items } from "../enums/items";
+import { images } from "../image/preload";
+import { keys } from "../input/input";
+import { Point } from "../types/point";
+import { isCollided } from "../utils/collision";
+import Bomb from "./Bomb";
+import { MapData } from "./Layout";
 
 export default class Player {
   x: number;
@@ -14,17 +17,25 @@ export default class Player {
   height: number;
   sx: number;
   sy: number;
+  sWidth: number;
+  sHeight: number;
+  prevX: number;
+  prevY: number;
+  prevItem: Items;
   direction: Direction;
   spriteCounter: number;
   img: HTMLImageElement;
   elaspedFrame: number = 0;
   currentFrame: number = 0;
   frameIndexes: number[];
+  isDead: boolean = false;
+  isDying: boolean = false;
   speed: number;
   offsetX: number;
   offsetY: number;
   playerOffset: number = 15;
   mapData: MapData;
+  bomb: Bomb;
   ctx: CanvasRenderingContext2D;
 
   constructor(mapData: MapData, ctx: CanvasRenderingContext2D) {
@@ -36,9 +47,15 @@ export default class Player {
 
     this.sx = 0;
     this.sy = 0;
+    this.sWidth = 16;
+    this.sHeight = 16;
+
+    this.prevX = 0;
+    this.prevY = 0;
+    this.prevItem = Items.Empty;
 
     this.spriteCounter = 0;
-    this.speed = 3;
+    this.speed = 5;
     this.img = images.player.playerSprite;
 
     this.direction = Direction.Right;
@@ -46,39 +63,48 @@ export default class Player {
     this.offsetX = 0;
     this.offsetY = 0;
     this.mapData = mapData;
+
+    this.bomb = new Bomb(this, this.mapData, this.ctx);
   }
 
   /**
    * Draw player on canvas
    */
   draw() {
+    if (this.isDead) return;
+
     this.elaspedFrame++;
     this.currentFrame = (this.currentFrame + 1) % this.frameIndexes.length;
+    if (this.isDying) {
+      this.frameBuffer(25);
+    }
 
     if (keys.left) {
       this.direction = Direction.Left;
-      this.frameBuffer();
       this.moveLeft();
     } else if (keys.right) {
       this.direction = Direction.Right;
-      this.frameBuffer();
       this.moveRight();
     } else if (keys.up) {
       this.direction = Direction.Up;
-      this.frameBuffer();
       this.moveUp();
     } else if (keys.down) {
       this.direction = Direction.Down;
       this.moveDown();
-      this.frameBuffer();
+    } else if (keys.keyX && !this.bomb.bombActive) {
+      this.dropBomb();
+    }
+
+    if (this.bomb.bombActive) {
+      this.bomb.draw();
     }
 
     this.ctx.drawImage(
       this.img,
       this.sx,
-      0,
-      16,
-      16,
+      this.sy,
+      this.sWidth,
+      this.sHeight,
       this.x,
       this.y,
       this.width,
@@ -89,10 +115,13 @@ export default class Player {
   /**
    * Frame Buffer
    */
-  frameBuffer() {
+  // TODO: move it to utils
+  frameBuffer(delta: number = 4) {
     const frameIndex = this.frameIndexes[this.currentFrame];
-    this.frameIndexes = DIRECTION_MAP[this.direction];
-    if (this.elaspedFrame % 8 === 0) {
+    this.frameIndexes = this.isDying
+      ? DIRECTION_MAP["dying"]
+      : DIRECTION_MAP[this.direction];
+    if (this.elaspedFrame % delta === 0) {
       this.sx = frameIndex * 16;
     }
   }
@@ -102,6 +131,7 @@ export default class Player {
    */
   moveLeft() {
     if (isCollided(this, Direction.Left)) return;
+    this.frameBuffer();
     this.x -= this.speed;
     if (this.x < MAP.tile.size) {
       this.x = MAP.tile.size;
@@ -110,6 +140,7 @@ export default class Player {
       this.ctx.translate(this.speed, 0);
       this.offsetX += this.speed;
     }
+    this.updateTile();
   }
 
   /**
@@ -117,8 +148,9 @@ export default class Player {
    */
   moveRight() {
     if (isCollided(this, Direction.Right)) return;
+    this.frameBuffer();
     this.x += this.speed;
-    if ( this.x + this.width > (this.mapData.width-1) * MAP.tile.size) {
+    if (this.x + this.width > (this.mapData.width - 1) * MAP.tile.size) {
       this.x = (this.mapData.width - 1) * MAP.tile.size - this.width;
     }
     if (
@@ -128,6 +160,7 @@ export default class Player {
       this.ctx.translate(-this.speed, 0);
       this.offsetX -= this.speed;
     }
+    this.updateTile();
   }
 
   /**
@@ -135,10 +168,12 @@ export default class Player {
    */
   moveUp() {
     if (isCollided(this, Direction.Up)) return;
+    this.frameBuffer();
     this.y -= this.speed;
     if (this.y < MAP.tile.size) {
       this.y = MAP.tile.size;
     }
+    this.updateTile();
   }
 
   /**
@@ -146,10 +181,47 @@ export default class Player {
    */
   moveDown() {
     if (isCollided(this, Direction.Down)) return;
+    this.frameBuffer();
     this.y += this.speed;
-    if (
-      this.y + this.height > (this.mapData.height-1) * MAP.tile.size) {
+    if (this.y + this.height > (this.mapData.height - 1) * MAP.tile.size) {
       this.y = (this.mapData.height - 1) * MAP.tile.size - this.height;
+    }
+    this.updateTile();
+  }
+
+  /**
+   * Calculate coordinate of player in map
+   */
+  calculateCoordinate(): Point {
+    const x = Math.floor((this.x + this.width / 2) / MAP.tile.size);
+    const y = Math.floor((this.y + this.height / 2) / MAP.tile.size);
+    return { x: x, y: y };
+  }
+
+  /**
+   * Drop bomb at current position
+   */
+  dropBomb() {
+    this.bomb = new Bomb(this, this.mapData, this.ctx);
+    this.bomb.bombActive = true;
+
+    setTimeout(() => {
+      this.bomb.calculateExplosion();
+    }, 2500);
+  }
+
+  /**
+   * Update tile as player move through it
+   */
+  updateTile() {
+    const pos = this.calculateCoordinate();
+
+    if (pos.x !== this.prevX || pos.y !== this.prevY) {
+      this.mapData.tiles[this.prevX][this.prevY] = this.prevItem;
+      this.prevItem = this.mapData.tiles[pos.x][pos.y];
+      this.mapData.tiles[pos.x][pos.y] = Items.Player;
+      this.prevX = pos.x;
+      this.prevY = pos.y;
     }
   }
 }

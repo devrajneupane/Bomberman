@@ -5,6 +5,7 @@ export const keys = {
   down: false,
   enter: false,
   space: false,
+  keyX: false,
 };
 
 export const clicks = {
@@ -54,6 +55,10 @@ document.addEventListener("keydown", (event: KeyboardEvent) => {
       keys.space = true;
       break;
     }
+    case "x": {
+      keys.keyX = true;
+      break;
+    }
   }
 });
 
@@ -64,6 +69,7 @@ document.addEventListener("keyup", () => {
   keys.down = false;
   keys.enter = false;
   // keys.space = false;
+  keys.keyX = false;
 });
 
 // TODO: make click event listner only active for layout editor
@@ -73,7 +79,6 @@ itemCanvas.addEventListener("click", (event: MouseEvent) => {
   clicks.item.x = event.x;
   clicks.item.y = event.y;
 });
-
 
 // Event listener for when mouse button is pressed down insde editor area
 canvas.addEventListener("mousedown", (event: MouseEvent) => {

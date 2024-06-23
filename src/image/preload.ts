@@ -7,6 +7,16 @@ import wallExplosionSprite from "/game/sprites/wall/wall-explosion.png";
 import playerSprite from "/game/sprites/player/walking.png";
 import playerDyingSprite from "/game/sprites/player/killing.png";
 
+// Bomb
+import bombSprite from "/game/sprites/bomb/bomb.png";
+import bombExplosionCenterSprite from "/game/sprites/bomb/explosion/explosion-center.png";
+import bombExplosionHorizontalSprite from "/game/sprites/bomb/explosion/explosion-extension-horizontal.png";
+import bombExplosionVerticalSprite from "/game/sprites/bomb/explosion/explosion-extension-vertical.png";
+import bombExplosionLeftSprite from "/game/sprites/bomb/explosion/explosion-left-lenght.png";
+import bombExplosionBottomSprite from "/game/sprites/bomb/explosion/explosion-lower-lenght.png";
+import bombExplosionRightSprite from "/game/sprites/bomb/explosion/explosion-right-lenght.png";
+import bombExplosionTopSprite from "/game/sprites/bomb/explosion/explosion-upper-lenght.png";
+
 // Power ups
 import bombUp from "/game/images/power-up/bomb-up.png";
 import fireUp from "/game/images/power-up/fire-up.png";
@@ -36,6 +46,16 @@ export const images = {
   player: {
     playerSprite: createImageElement(playerSprite),
     playerDyingSprite: createImageElement(playerDyingSprite),
+  },
+  bomb: {
+    bombSprite: createImageElement(bombSprite),
+    bombExplosionCenterSprite: createImageElement(bombExplosionCenterSprite),
+    bombExplosionExtensionHorizontalSprite: createImageElement(bombExplosionHorizontalSprite),
+    bombExplosionExtensionVerticalSprite: createImageElement(bombExplosionVerticalSprite),
+    bombExplosionLeftSprite: createImageElement(bombExplosionLeftSprite),
+    bombExplosionBottomSprite: createImageElement(bombExplosionBottomSprite),
+    bombExplosionRightSprite: createImageElement(bombExplosionRightSprite),
+    bombExplosionTopSprite: createImageElement(bombExplosionTopSprite),
   },
   powerUps: {
     bombUp: createImageElement(bombUp),
