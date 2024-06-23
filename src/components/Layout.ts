@@ -11,6 +11,8 @@ export type MapData = {
 export class Layout {
   x: number = 0;
   y: number = 0;
+  width: number = MAP.tile.size;
+  height: number = MAP.tile.size;
   mapData: MapData;
   ctx: CanvasRenderingContext2D;
   img: HTMLImageElement = images.wall.concreteWall;
@@ -28,7 +30,7 @@ export class Layout {
       this.img,
       0,
       0,
-      15,
+      16,
       16,
       this.x,
       this.y,
@@ -43,7 +45,11 @@ export class Layout {
   renderMap() {
     for (let y = 0; y < this.mapData.height; y++) {
       for (let x = 0; x < this.mapData.width; x++) {
-        const tileType = this.mapData.tiles[x][y];
+        // const tileType = this.mapData.tiles[x][y];
+        const tileType =
+          (x & 1) === 0 && (y & 1) === 0
+            ? Items.concreteWall
+            : this.mapData.tiles[x][y];
 
         // TODO: Refactor this swtich statement
         switch (tileType) {
@@ -56,8 +62,9 @@ export class Layout {
             this.img = images.wall.brickWall;
             break;
           case Items.Player:
-            this.img = images.player.playerSprite;
-            break;
+            // this.img = images.player.playerSprite;
+            // break;
+            continue;
           case Items.Ballom:
             this.img = images.enemies.ballomSprite;
             break;

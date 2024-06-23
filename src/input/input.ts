@@ -80,7 +80,6 @@ itemCanvas.addEventListener("click", (event: MouseEvent) => {
   clicks.item.y = event.y;
 });
 
-
 // Event listener for when mouse button is pressed down insde editor area
 canvas.addEventListener("mousedown", (event: MouseEvent) => {
   if (event.button === 0) {

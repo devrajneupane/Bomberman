@@ -4,17 +4,10 @@ import { Layout, MapData } from "./Layout";
 import { MAP } from "../constants/map";
 import { CANVAS } from "../constants/canvas";
 import { Items } from "../enums/items";
-
-interface Values {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  multiple: boolean;
-}
+import { IValues } from "../interfaces/IValues";
 
 export class LayoutEditor extends Layout {
-  items: Record<string, Values>;
+  items: Record<string, IValues>;
   canvas: HTMLCanvasElement;
   itemCanvas: HTMLCanvasElement;
   itemCtx: CanvasRenderingContext2D;
