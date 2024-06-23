@@ -8,11 +8,12 @@ import { keys } from "../input/input";
 import { Point } from "../types/point";
 import { isCollided } from "../utils/collision";
 import Bomb from "./Bomb";
+// import Enemy from "./Enemy";
 import { MapData } from "./Layout";
+import Game from "./Game";
 
 export default class Player {
-  x: number;
-  y: number;
+  position: Point;
   width: number;
   height: number;
   sx: number;
@@ -33,17 +34,23 @@ export default class Player {
   speed: number;
   offsetX: number;
   offsetY: number;
-  playerOffset: number = 15;
+  playerOffset: number = 10;
   mapData: MapData;
   bomb: Bomb;
+  game: Game;
+  // enemy: Enemy;
   ctx: CanvasRenderingContext2D;
 
-  constructor(mapData: MapData, ctx: CanvasRenderingContext2D) {
-    this.x = MAP.tile.size + this.playerOffset;
-    this.y = MAP.tile.size + this.playerOffset;
+  constructor(game: Game, mapData: MapData, ctx: CanvasRenderingContext2D) {
+    this.ctx = ctx;
+    this.game = game;
+
+    this.position = {
+      x: MAP.tile.size + this.playerOffset,
+      y: MAP.tile.size + this.playerOffset,
+    };
     this.width = MAP.tile.size - this.playerOffset;
     this.height = MAP.tile.size - this.playerOffset;
-    this.ctx = ctx;
 
     this.sx = 0;
     this.sy = 0;
@@ -55,7 +62,7 @@ export default class Player {
     this.prevItem = Items.Empty;
 
     this.spriteCounter = 0;
-    this.speed = 5;
+    this.speed = 2;
     this.img = images.player.playerSprite;
 
     this.direction = Direction.Right;
@@ -64,7 +71,7 @@ export default class Player {
     this.offsetY = 0;
     this.mapData = mapData;
 
-    this.bomb = new Bomb(this, this.mapData, this.ctx);
+    this.bomb = new Bomb(game, this, this.mapData, this.ctx);
   }
 
   /**
@@ -75,24 +82,33 @@ export default class Player {
 
     this.elaspedFrame++;
     this.currentFrame = (this.currentFrame + 1) % this.frameIndexes.length;
+
     if (this.isDying) {
       this.frameBuffer(25);
-    }
-
-    if (keys.left) {
-      this.direction = Direction.Left;
-      this.moveLeft();
-    } else if (keys.right) {
-      this.direction = Direction.Right;
-      this.moveRight();
-    } else if (keys.up) {
-      this.direction = Direction.Up;
-      this.moveUp();
-    } else if (keys.down) {
-      this.direction = Direction.Down;
-      this.moveDown();
-    } else if (keys.keyX && !this.bomb.bombActive) {
-      this.dropBomb();
+    } else {
+      switch (true) {
+        case keys.left:
+          this.direction = Direction.Left;
+          this.moveLeft();
+          break;
+        case keys.right:
+          this.direction = Direction.Right;
+          this.moveRight();
+          break;
+        case keys.up:
+          this.direction = Direction.Up;
+          this.moveUp();
+          break;
+        case keys.down:
+          this.direction = Direction.Down;
+          this.moveDown();
+          break;
+        case keys.keyX && !this.bomb.bombActive:
+          this.dropBomb();
+          break;
+        default:
+          break;
+      }
     }
 
     if (this.bomb.bombActive) {
@@ -105,8 +121,8 @@ export default class Player {
       this.sy,
       this.sWidth,
       this.sHeight,
-      this.x,
-      this.y,
+      this.position.x,
+      this.position.y,
       this.width,
       this.height,
     );
@@ -132,11 +148,11 @@ export default class Player {
   moveLeft() {
     if (isCollided(this, Direction.Left)) return;
     this.frameBuffer();
-    this.x -= this.speed;
-    if (this.x < MAP.tile.size) {
-      this.x = MAP.tile.size;
+    this.position.x -= this.speed;
+    if (this.position.x < MAP.tile.size) {
+      this.position.x = MAP.tile.size;
     }
-    if (this.x <= CANVAS.width / 2 && this.offsetX < 0) {
+    if (this.position.x <= CANVAS.width / 2 && this.offsetX < 0) {
       this.ctx.translate(this.speed, 0);
       this.offsetX += this.speed;
     }
@@ -149,12 +165,15 @@ export default class Player {
   moveRight() {
     if (isCollided(this, Direction.Right)) return;
     this.frameBuffer();
-    this.x += this.speed;
-    if (this.x + this.width > (this.mapData.width - 1) * MAP.tile.size) {
-      this.x = (this.mapData.width - 1) * MAP.tile.size - this.width;
+    this.position.x += this.speed;
+    if (
+      this.position.x + this.width >
+      (this.mapData.width - 1) * MAP.tile.size
+    ) {
+      this.position.x = (this.mapData.width - 1) * MAP.tile.size - this.width;
     }
     if (
-      this.x > CANVAS.width / 2 &&
+      this.position.x > CANVAS.width / 2 &&
       this.offsetX > -(this.mapData.width * MAP.tile.size - CANVAS.width - 1)
     ) {
       this.ctx.translate(-this.speed, 0);
@@ -169,9 +188,9 @@ export default class Player {
   moveUp() {
     if (isCollided(this, Direction.Up)) return;
     this.frameBuffer();
-    this.y -= this.speed;
-    if (this.y < MAP.tile.size) {
-      this.y = MAP.tile.size;
+    this.position.y -= this.speed;
+    if (this.position.y < MAP.tile.size) {
+      this.position.y = MAP.tile.size;
     }
     this.updateTile();
   }
@@ -182,9 +201,12 @@ export default class Player {
   moveDown() {
     if (isCollided(this, Direction.Down)) return;
     this.frameBuffer();
-    this.y += this.speed;
-    if (this.y + this.height > (this.mapData.height - 1) * MAP.tile.size) {
-      this.y = (this.mapData.height - 1) * MAP.tile.size - this.height;
+    this.position.y += this.speed;
+    if (
+      this.position.y + this.height >
+      (this.mapData.height - 1) * MAP.tile.size
+    ) {
+      this.position.y = (this.mapData.height - 1) * MAP.tile.size - this.height;
     }
     this.updateTile();
   }
@@ -193,8 +215,8 @@ export default class Player {
    * Calculate coordinate of player in map
    */
   calculateCoordinate(): Point {
-    const x = Math.floor((this.x + this.width / 2) / MAP.tile.size);
-    const y = Math.floor((this.y + this.height / 2) / MAP.tile.size);
+    const x = Math.floor((this.position.x + this.width / 2) / MAP.tile.size);
+    const y = Math.floor((this.position.y + this.height / 2) / MAP.tile.size);
     return { x: x, y: y };
   }
 
@@ -202,11 +224,12 @@ export default class Player {
    * Drop bomb at current position
    */
   dropBomb() {
-    this.bomb = new Bomb(this, this.mapData, this.ctx);
+    this.bomb = new Bomb(this.game, this, this.mapData, this.ctx);
     this.bomb.bombActive = true;
 
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       this.bomb.calculateExplosion();
+      clearTimeout(timeoutId);
     }, 2500);
   }
 

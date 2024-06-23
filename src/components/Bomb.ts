@@ -1,10 +1,14 @@
 import { MAP } from "../constants/map";
+import { Direction } from "../enums/Direction";
 import { Items } from "../enums/items";
 import { images } from "../image/preload";
+import { Obj } from "../types/Obj";
 import { Point } from "../types/point";
 import BombExplosion from "./BombExplosion";
+import Game from "./Game";
 import { MapData } from "./Layout";
 import Player from "./Player";
+import Wall from "./Wall";
 
 export default class Bomb {
   position: Point;
@@ -14,6 +18,7 @@ export default class Bomb {
   width: number = MAP.tile.size;
   height: number = MAP.tile.size;
   player: Player;
+  game: Game;
   bombActive: boolean = false;
   bombExploded: boolean;
   spriteCounter: number;
@@ -23,10 +28,16 @@ export default class Bomb {
   mapData: MapData;
   img: HTMLImageElement;
   ctx: CanvasRenderingContext2D;
-  explosionArray: BombExplosion[];
+  explosionArray: Obj[];
 
-  constructor(player: Player, mapData: MapData, ctx: CanvasRenderingContext2D) {
+  constructor(
+    game: Game,
+    player: Player,
+    mapData: MapData,
+    ctx: CanvasRenderingContext2D,
+  ) {
     this.ctx = ctx;
+    this.game = game;
     this.player = player;
     this.mapData = mapData;
 
@@ -64,13 +75,6 @@ export default class Bomb {
       this.width,
       this.height,
     );
-    this.ctx.strokeStyle = "red";
-    this.ctx.strokeRect(
-      this.position.x * MAP.tile.size,
-      this.position.y * MAP.tile.size,
-      this.width,
-      this.height,
-    );
     for (let explosion of this.explosionArray) {
       explosion.draw();
     }
@@ -80,8 +84,8 @@ export default class Bomb {
     const frameIndex = this.frameIndexes[this.currentFrame];
     if (this.elaspedFrame % 25 === 0) {
       this.sPosition.x = frameIndex * this.sWidth;
-      if (frameIndex === 2){
-        this.frameIndexes.reverse()
+      if (frameIndex === 2) {
+        this.frameIndexes.reverse();
       }
     }
   }
@@ -96,9 +100,9 @@ export default class Bomb {
     // Change bomb image
     this.img = images.bomb.bombExplosionCenterSprite;
 
-    for (let direction of ["left", "top", "right", "bottom"]) {
+    for (let direction of Object.values(Direction)) {
       switch (direction) {
-        case "left":
+        case Direction.Left:
           this.bombEffect(
             this.position.x - 1,
             this.position.y,
@@ -106,7 +110,7 @@ export default class Bomb {
           );
           break;
 
-        case "top":
+        case Direction.Up:
           this.bombEffect(
             this.position.x,
             this.position.y - 1,
@@ -114,7 +118,7 @@ export default class Bomb {
           );
           break;
 
-        case "right":
+        case Direction.Right:
           this.bombEffect(
             this.position.x + 1,
             this.position.y,
@@ -122,7 +126,7 @@ export default class Bomb {
           );
           break;
 
-        case "bottom":
+        case Direction.Down:
           this.bombEffect(
             this.position.x,
             this.position.y + 1,
@@ -133,8 +137,9 @@ export default class Bomb {
         default:
           break;
       }
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         this.bombActive = false;
+        clearTimeout(timeoutId);
       }, 1000);
     }
     this.bombExploded = true;
@@ -151,17 +156,24 @@ export default class Bomb {
           x: x * MAP.tile.size,
           y: y * MAP.tile.size,
         };
-        const leftExplosion = new BombExplosion(pos, img, this.ctx);
-        this.explosionArray.push(leftExplosion);
+        const bombExplosion = new BombExplosion(pos, img, this.game, this.ctx);
+        this.explosionArray.push(bombExplosion);
         break;
 
       case Items.brickWall:
-        // TODO: explode brick wall
-        this.mapData.tiles[x][y] = 0;
+        // Explode brick wall and reset its tile
+        const brickWall = new Wall(
+          { x: x * MAP.tile.size, y: y * MAP.tile.size },
+          images.wall.brickWallExplosionSprite,
+          this.ctx,
+        );
+        this.explosionArray.push(brickWall);
+        this.mapData.tiles[x][y] = Items.Empty;
         break;
 
       case Items.Player:
-        // TODO: explode player and reset statge or game over
+        // Explode player
+        // TODO: reset stage or game over
         this.player.img = images.player.playerDyingSprite;
         this.player.sHeight = 21;
         this.player.currentFrame = 0;
@@ -169,14 +181,28 @@ export default class Bomb {
         this.player.isDying = true;
         this.elaspedFrame = 0;
 
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
           this.player.isDead = true;
+          const { x, y } = this.player.calculateCoordinate();
+          this.mapData.tiles[x][y] = Items.Empty;
+          clearTimeout(timeoutId);
         }, 2000);
         break;
 
-      case Items.Dahl:
-        // TODO: explode enemy and increase score
-        break;
+      // case Items.Ballom:
+      // case Items.Dahl:
+      // case Items.Dahl:
+      // case Items.Minvo:
+      // case Items.Onil:
+      // case Items.Ovape:
+      // case Items.Pass:
+      // case Items.Pontan:
+      // TODO: explode enemy and increase score
+      // this.game.enemyArray.forEach((enemy) => {
+      //   enemy.img = images.enemies.enemyDyingSprite;
+      // });
+      //
+      // break;
 
       default:
         break;

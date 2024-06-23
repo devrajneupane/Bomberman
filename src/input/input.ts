@@ -59,6 +59,11 @@ document.addEventListener("keydown", (event: KeyboardEvent) => {
       keys.keyX = true;
       break;
     }
+    // NOTE: to quickly refresh the page
+    case "r": {
+      location.reload()
+      break;
+    }
   }
 });
 
