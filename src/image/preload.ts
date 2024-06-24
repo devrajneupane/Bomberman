@@ -36,6 +36,7 @@ import onilSprite from "/game/sprites/enemies/onil.png";
 import ovapeSprite from "/game/sprites/enemies/ovape.png";
 import passSprite from "/game/sprites/enemies/pass.png";
 import pontanSprite from "/game/sprites/enemies/pontan.png";
+import enemyDyingSprite from "/game/sprites/enemies/destroy-enemy/destroy-enemy.png"
 
 export const images = {
   wall: {
@@ -73,6 +74,7 @@ export const images = {
     ovapeSprite: createImageElement(ovapeSprite),
     passSprite: createImageElement(passSprite),
     pontanSprite: createImageElement(pontanSprite),
+    enemyDyingSprite: createImageElement(enemyDyingSprite)
   },
   door: createImageElement(door),
 };
