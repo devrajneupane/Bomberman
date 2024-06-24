@@ -23,7 +23,9 @@ export default class Game {
   layoutEditor: LayoutEditor;
   loadedFromEditor: boolean;
   player: Player;
+
   collectible: Collectible;
+
   enemy: Enemy;
   enemyArray: Enemy[];
   bomb: Bomb;

@@ -5,7 +5,6 @@
 export function getRandomKey<T extends Record<string, any>>(
   obj: T,
 ): keyof T | undefined {
-// export function getRandomKey(obj: Record<string, any>): string | undefined {
   const keys = Object.keys(obj);
   if (keys.length === 0) return undefined;
   const randomIndex = Math.floor(Math.random() * keys.length);
@@ -19,10 +18,9 @@ export function getRandomKey<T extends Record<string, any>>(
 export function getRandomValue<T extends Record<string, any>>(
   obj: T,
 ): T[keyof T] | undefined {
-// export function getRandomValue(obj: Record<string, any>): string | undefined {
   const keys = Object.keys(obj);
   if (keys.length === 0) return undefined;
   const randomIndex = Math.floor(Math.random() * keys.length);
-  const randomKey = keys[randomIndex] as string;
+  const randomKey = keys[randomIndex] as keyof T;
   return obj[randomKey];
 }

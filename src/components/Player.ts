@@ -13,6 +13,7 @@ import { MapData } from "./Layout";
 import Game from "./Game";
 import Collectible from "./Collectibles";
 
+
 export default class Player {
   position: Point;
   width: number;
@@ -39,6 +40,7 @@ export default class Player {
   mapData: MapData;
   bomb: Bomb;
   game: Game;
+
   collectible: Collectible;
   // enemy: Enemy;
   ctx: CanvasRenderingContext2D;
@@ -52,6 +54,7 @@ export default class Player {
     this.ctx = ctx;
     this.game = game;
     this.collectible = collectible;
+
 
     this.position = {
       x: MAP.tile.size + this.playerOffset,
@@ -90,8 +93,6 @@ export default class Player {
 
     this.elaspedFrame++;
     this.currentFrame = (this.currentFrame + 1) % this.frameIndexes.length;
-
-    console.log(this.collectible.hidden, this.speed);
 
     if (!this.collectible.hidden) {
       this.collectible.draw();

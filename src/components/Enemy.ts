@@ -13,6 +13,7 @@ import { getRandomKey, getRandomValue } from "../utils/helper";
 import { isCollidedAABB, isEnemyCollided } from "../utils/collision";
 import { getRandomEnemyPosition } from "../utils/getRandomEnemyPosition";
 
+
 export default class Enemy {
   position: Point;
   width: number;
