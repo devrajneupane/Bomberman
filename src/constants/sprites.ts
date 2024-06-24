@@ -70,3 +70,35 @@ export const ENEMIES: IEnemy = {
     },
   },
 };
+
+export const POWER_UP = {
+  size: {
+    sWidth: 16,
+    sHeight: 16,
+  },
+  sprites: {
+    bombUp: {
+      img: images.powerUps.bombUp,
+    },
+
+    fireUp: {
+      img: images.powerUps.fireUp,
+    },
+
+    flamePass: {
+      img: images.powerUps.flamePass,
+    },
+
+    remoteControl: {
+      img: images.powerUps.remoteControl,
+    },
+
+    speedUp: {
+      img: images.powerUps.remoteControl,
+    },
+
+    wallPass: {
+      img: images.powerUps.wallPass,
+    },
+  },
+};

@@ -5,6 +5,7 @@ import { images } from "../image/preload";
 import { Obj } from "../types/Obj";
 import { Point } from "../types/point";
 import BombExplosion from "./BombExplosion";
+import Collectible from "./Collectibles";
 import Game from "./Game";
 import { MapData } from "./Layout";
 import Player from "./Player";
@@ -19,6 +20,7 @@ export default class Bomb {
   height: number = MAP.tile.size;
   player: Player;
   game: Game;
+  collectible: Collectible;
   bombActive: boolean = false;
   bombExploded: boolean;
   spriteCounter: number;
@@ -33,12 +35,14 @@ export default class Bomb {
   constructor(
     game: Game,
     player: Player,
+    collectible: Collectible,
     mapData: MapData,
     ctx: CanvasRenderingContext2D,
   ) {
     this.ctx = ctx;
     this.game = game;
     this.player = player;
+    this.collectible = collectible;
     this.mapData = mapData;
 
     this.sWidth = 17;
@@ -168,12 +172,24 @@ export default class Bomb {
           this.ctx,
         );
         this.explosionArray.push(brickWall);
-        this.mapData.tiles[x][y] = Items.Empty;
+
+        // Check if collectible exists at this position and display it if exists
+        if (
+          x * MAP.tile.size === this.collectible.position.x &&
+          y * MAP.tile.size === this.collectible.position.y
+        ) {
+          this.collectible.hidden = false;
+          this.mapData.tiles[x][y] = Items.SpeedUp;
+        } else {
+          this.mapData.tiles[x][y] = Items.Empty;
+        }
         break;
 
       case Items.Player:
-        // Explode player
         // TODO: reset stage or game over
+        this.game.score = 0;
+
+        // Explode player
         this.player.img = images.player.playerDyingSprite;
         this.player.sHeight = 21;
         this.player.currentFrame = 0;
@@ -188,21 +204,6 @@ export default class Bomb {
           clearTimeout(timeoutId);
         }, 2000);
         break;
-
-      // case Items.Ballom:
-      // case Items.Dahl:
-      // case Items.Dahl:
-      // case Items.Minvo:
-      // case Items.Onil:
-      // case Items.Ovape:
-      // case Items.Pass:
-      // case Items.Pontan:
-      // TODO: explode enemy and increase score
-      // this.game.enemyArray.forEach((enemy) => {
-      //   enemy.img = images.enemies.enemyDyingSprite;
-      // });
-      //
-      // break;
 
       default:
         break;

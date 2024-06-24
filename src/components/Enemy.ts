@@ -1,15 +1,17 @@
-import { MAP } from "../constants/map";
-import { ENEMIES } from "../constants/sprites";
-import { images } from "../image/preload";
+import Player from "./Player";
+import { MapData } from "./Layout";
+import { Items } from "../enums/items";
 import { Point } from "../types/point";
 import { EnemySprite } from "../types/EnemySprite";
-import { MapData } from "./Layout";
 import { Direction } from "../enums/Direction";
+
+import { MAP } from "../constants/map";
+import { ENEMIES } from "../constants/sprites";
+
+import { images } from "../image/preload";
+import { getRandomKey, getRandomValue } from "../utils/helper";
 import { isCollidedAABB, isEnemyCollided } from "../utils/collision";
 import { getRandomEnemyPosition } from "../utils/getRandomEnemyPosition";
-import Player from "./Player";
-import { Items } from "../enums/items";
-import { getRandomKey, getRandomValue } from "../utils/helper";
 
 export default class Enemy {
   position: Point;
@@ -182,7 +184,7 @@ export default class Enemy {
   }
 
   /**
-   * Frame Buffer
+   * @desc Frame Buffer
    */
   frameBuffer() {
     const frameIndex = this.frameIndexes[this.currentFrame];
