@@ -6,6 +6,8 @@ import { LayoutEditor } from "./LayoutEditor";
 import { keys } from "../input/input";
 import mapData from "../tilemap.json";
 import { CANVAS } from "../constants/canvas";
+import Collectible from "./Collectibles";
+import { images } from "../image/preload";
 
 const canvas = document.querySelector<HTMLCanvasElement>("#canvas")!;
 const ctx = canvas.getContext("2d")!;
@@ -21,6 +23,9 @@ export default class Game {
   layoutEditor: LayoutEditor;
   loadedFromEditor: boolean;
   player: Player;
+
+  collectible: Collectible;
+
   enemy: Enemy;
   enemyArray: Enemy[];
   bomb: Bomb;
@@ -38,9 +43,21 @@ export default class Game {
 
     this.layout = new Layout(this.mapData, this.ctx);
     this.layoutEditor = new LayoutEditor(this.mapData, canvas, this.ctx);
-    this.player = new Player(this, this.mapData, this.ctx);
+    this.collectible = new Collectible(
+      this.mapData,
+      images.powerUps.speedUp,
+      this.ctx,
+    );
+    this.player = new Player(this, this.collectible, this.mapData, this.ctx);
     this.enemy = new Enemy(this.mapData, this.player, this.ctx);
-    this.bomb = new Bomb(this, this.player, this.mapData, this.ctx);
+    this.bomb = new Bomb(
+      this,
+      this.player,
+      this.collectible,
+      this.mapData,
+      this.ctx,
+    );
+    // this.bomb = new Bomb(this, this.player, this.mapData, this.ctx);
   }
 
   gameLoop() {
@@ -63,7 +80,9 @@ export default class Game {
       for (let enemy of this.enemyArray) {
         enemy.draw();
       }
-      this.player.draw();
+      if (!this.player.isDead) {
+        this.player.draw();
+      }
     }
   }
 }

@@ -3,7 +3,6 @@ import { Items } from "../enums/items";
 import Player from "../components/Player";
 import { Direction } from "../enums/Direction";
 import Enemy from "../components/Enemy";
-// import BombExplosion from "../components/BombExplosion";
 import { Obj } from "../types/Obj";
 
 /**
@@ -19,7 +18,7 @@ export function isCollidedAABB(obj1: Obj, obj2: Obj): boolean {
 }
 
 /**
- * Check collision between two object using neighbouring object type approach
+ * Check collision between player and object at current position
  */
 export function isCollided(
   player: Player,

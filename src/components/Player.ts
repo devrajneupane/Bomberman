@@ -6,11 +6,13 @@ import { Items } from "../enums/items";
 import { images } from "../image/preload";
 import { keys } from "../input/input";
 import { Point } from "../types/point";
-import { isCollided } from "../utils/collision";
+import { isCollided, isCollidedAABB } from "../utils/collision";
 import Bomb from "./Bomb";
 // import Enemy from "./Enemy";
 import { MapData } from "./Layout";
 import Game from "./Game";
+import Collectible from "./Collectibles";
+
 
 export default class Player {
   position: Point;
@@ -38,12 +40,21 @@ export default class Player {
   mapData: MapData;
   bomb: Bomb;
   game: Game;
+
+  collectible: Collectible;
   // enemy: Enemy;
   ctx: CanvasRenderingContext2D;
 
-  constructor(game: Game, mapData: MapData, ctx: CanvasRenderingContext2D) {
+  constructor(
+    game: Game,
+    collectible: Collectible,
+    mapData: MapData,
+    ctx: CanvasRenderingContext2D,
+  ) {
     this.ctx = ctx;
     this.game = game;
+    this.collectible = collectible;
+
 
     this.position = {
       x: MAP.tile.size + this.playerOffset,
@@ -71,7 +82,7 @@ export default class Player {
     this.offsetY = 0;
     this.mapData = mapData;
 
-    this.bomb = new Bomb(game, this, this.mapData, this.ctx);
+    this.bomb = new Bomb(game, this, this.collectible, this.mapData, this.ctx);
   }
 
   /**
@@ -82,6 +93,11 @@ export default class Player {
 
     this.elaspedFrame++;
     this.currentFrame = (this.currentFrame + 1) % this.frameIndexes.length;
+
+    if (!this.collectible.hidden) {
+      this.collectible.draw();
+      this.collecCollectible();
+    }
 
     if (this.isDying) {
       this.frameBuffer(25);
@@ -224,7 +240,13 @@ export default class Player {
    * Drop bomb at current position
    */
   dropBomb() {
-    this.bomb = new Bomb(this.game, this, this.mapData, this.ctx);
+    this.bomb = new Bomb(
+      this.game,
+      this,
+      this.collectible,
+      this.mapData,
+      this.ctx,
+    );
     this.bomb.bombActive = true;
 
     const timeoutId = setTimeout(() => {
@@ -246,5 +268,25 @@ export default class Player {
       this.prevX = pos.x;
       this.prevY = pos.y;
     }
+  }
+
+  /**
+   * Colect colectible and add it's powerup to player
+   */
+  collecCollectible() {
+    if (!isCollidedAABB(this, this.collectible)) return;
+    console.log("am i being collided");
+
+    switch (this.collectible.name) {
+      case Items.SpeedUp:
+        this.speed++;
+        break;
+
+      default:
+        break;
+    }
+
+    // this.mapData.tiles[pos.x][pos.y] = Items.Empty;
+    this.collectible.hidden = true;
   }
 }
