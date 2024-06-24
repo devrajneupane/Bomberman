@@ -1,4 +1,5 @@
 import { MAP } from "../constants/map";
+import { Direction } from "../enums/Direction";
 import { Items } from "../enums/items";
 import { images } from "../image/preload";
 import { Point } from "../types/point";
@@ -90,9 +91,9 @@ export default class Bomb {
     // Change bomb image
     this.img = images.bomb.bombExplosionCenterSprite;
 
-    for (let direction of ["left", "top", "right", "bottom"]) {
+    for (let direction of Object.values(Direction)) {
       switch (direction) {
-        case "left":
+        case Direction.Left:
           this.bombEffect(
             this.position.x - 1,
             this.position.y,
@@ -100,7 +101,7 @@ export default class Bomb {
           );
           break;
 
-        case "top":
+        case Direction.Up:
           this.bombEffect(
             this.position.x,
             this.position.y - 1,
@@ -108,7 +109,7 @@ export default class Bomb {
           );
           break;
 
-        case "right":
+        case Direction.Right:
           this.bombEffect(
             this.position.x + 1,
             this.position.y,
@@ -116,7 +117,7 @@ export default class Bomb {
           );
           break;
 
-        case "bottom":
+        case Direction.Down:
           this.bombEffect(
             this.position.x,
             this.position.y + 1,
@@ -127,8 +128,9 @@ export default class Bomb {
         default:
           break;
       }
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         this.bombActive = false;
+        clearTimeout(timeoutId);
       }, 1000);
     }
     this.bombExploded = true;
@@ -162,7 +164,7 @@ export default class Bomb {
 
       case Items.Player:
         // Explode player
-        // TODO: reset statge or game over
+        // TODO: reset stage or game over
         this.player.img = images.player.playerDyingSprite;
         this.player.sHeight = 21;
         this.player.currentFrame = 0;
@@ -170,13 +172,25 @@ export default class Bomb {
         this.player.isDying = true;
         this.elaspedFrame = 0;
 
-        setTimeout(() => {
+        const timeoutId = setTimeout(() => {
           this.player.isDead = true;
+          const { x, y } = this.player.calculateCoordinate();
+          this.mapData.tiles[x][y] = Items.Empty;
+          clearTimeout(timeoutId);
         }, 2000);
         break;
 
-      case Items.Dahl:
+        case Items.Ballom:
+        case Items.Dahl:
+        case Items.Dahl:
+        case Items.Minvo:
+        case Items.Onil:
+        case Items.Ovape:
+        case Items.Pass:
+        case Items.Pontan:
         // TODO: explode enemy and increase score
+        console.log('enemy');
+
         break;
 
       default:

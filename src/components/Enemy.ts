@@ -193,10 +193,11 @@ export default class Enemy {
     this.player.isDying = true;
     this.elaspedFrame = 0;
 
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       this.player.isDead = true;
       const { x, y } = this.player.calculateCoordinate();
       this.mapData.tiles[x][y] = Items.Empty;
+      clearTimeout(timeoutId)
     }, 2000);
   }
 

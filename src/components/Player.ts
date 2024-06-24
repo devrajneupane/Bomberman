@@ -8,6 +8,7 @@ import { keys } from "../input/input";
 import { Point } from "../types/point";
 import { isCollided } from "../utils/collision";
 import Bomb from "./Bomb";
+// import Enemy from "./Enemy";
 import { MapData } from "./Layout";
 
 export default class Player {
@@ -35,6 +36,7 @@ export default class Player {
   playerOffset: number = 10;
   mapData: MapData;
   bomb: Bomb;
+  // enemy: Enemy;
   ctx: CanvasRenderingContext2D;
 
   constructor(mapData: MapData, ctx: CanvasRenderingContext2D) {
