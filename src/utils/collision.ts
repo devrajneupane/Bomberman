@@ -3,11 +3,13 @@ import { Items } from "../enums/items";
 import Player from "../components/Player";
 import { Direction } from "../enums/Direction";
 import Enemy from "../components/Enemy";
+// import BombExplosion from "../components/BombExplosion";
+import { Obj } from "../types/Obj";
 
 /**
  * Collision between two rectangular object using AABB technique
  */
-export function isCollidedAABB(obj1: Player | Enemy, obj2: Player | Enemy): boolean {
+export function isCollidedAABB(obj1: Obj, obj2: Obj): boolean {
   return (
     obj1.position.x < obj2.position.x + obj2.width &&
     obj1.position.x + obj2.width > obj2.position.x &&

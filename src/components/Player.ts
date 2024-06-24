@@ -10,6 +10,7 @@ import { isCollided } from "../utils/collision";
 import Bomb from "./Bomb";
 // import Enemy from "./Enemy";
 import { MapData } from "./Layout";
+import Game from "./Game";
 
 export default class Player {
   position: Point;
@@ -36,17 +37,20 @@ export default class Player {
   playerOffset: number = 10;
   mapData: MapData;
   bomb: Bomb;
+  game: Game;
   // enemy: Enemy;
   ctx: CanvasRenderingContext2D;
 
-  constructor(mapData: MapData, ctx: CanvasRenderingContext2D) {
+  constructor(game: Game, mapData: MapData, ctx: CanvasRenderingContext2D) {
+    this.ctx = ctx;
+    this.game = game;
+
     this.position = {
       x: MAP.tile.size + this.playerOffset,
       y: MAP.tile.size + this.playerOffset,
     };
     this.width = MAP.tile.size - this.playerOffset;
     this.height = MAP.tile.size - this.playerOffset;
-    this.ctx = ctx;
 
     this.sx = 0;
     this.sy = 0;
@@ -67,7 +71,7 @@ export default class Player {
     this.offsetY = 0;
     this.mapData = mapData;
 
-    this.bomb = new Bomb(this, this.mapData, this.ctx);
+    this.bomb = new Bomb(game, this, this.mapData, this.ctx);
   }
 
   /**
@@ -78,24 +82,33 @@ export default class Player {
 
     this.elaspedFrame++;
     this.currentFrame = (this.currentFrame + 1) % this.frameIndexes.length;
+
     if (this.isDying) {
       this.frameBuffer(25);
-    }
-
-    if (keys.left) {
-      this.direction = Direction.Left;
-      this.moveLeft();
-    } else if (keys.right) {
-      this.direction = Direction.Right;
-      this.moveRight();
-    } else if (keys.up) {
-      this.direction = Direction.Up;
-      this.moveUp();
-    } else if (keys.down) {
-      this.direction = Direction.Down;
-      this.moveDown();
-    } else if (keys.keyX && !this.bomb.bombActive) {
-      this.dropBomb();
+    } else {
+      switch (true) {
+        case keys.left:
+          this.direction = Direction.Left;
+          this.moveLeft();
+          break;
+        case keys.right:
+          this.direction = Direction.Right;
+          this.moveRight();
+          break;
+        case keys.up:
+          this.direction = Direction.Up;
+          this.moveUp();
+          break;
+        case keys.down:
+          this.direction = Direction.Down;
+          this.moveDown();
+          break;
+        case keys.keyX && !this.bomb.bombActive:
+          this.dropBomb();
+          break;
+        default:
+          break;
+      }
     }
 
     if (this.bomb.bombActive) {
@@ -211,11 +224,12 @@ export default class Player {
    * Drop bomb at current position
    */
   dropBomb() {
-    this.bomb = new Bomb(this, this.mapData, this.ctx);
+    this.bomb = new Bomb(this.game, this, this.mapData, this.ctx);
     this.bomb.bombActive = true;
 
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       this.bomb.calculateExplosion();
+      clearTimeout(timeoutId);
     }, 2500);
   }
 

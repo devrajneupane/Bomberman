@@ -38,9 +38,9 @@ export default class Game {
 
     this.layout = new Layout(this.mapData, this.ctx);
     this.layoutEditor = new LayoutEditor(this.mapData, canvas, this.ctx);
-    this.player = new Player(this.mapData, this.ctx);
+    this.player = new Player(this, this.mapData, this.ctx);
     this.enemy = new Enemy(this.mapData, this.player, this.ctx);
-    this.bomb = new Bomb(this.player, this.mapData, this.ctx);
+    this.bomb = new Bomb(this, this.player, this.mapData, this.ctx);
   }
 
   gameLoop() {
@@ -50,7 +50,7 @@ export default class Game {
       this.layoutEditor.itemBar();
     } else {
       if (!this.loadedFromEditor) {
-        this.enemyArray = Array(50)
+        this.enemyArray = Array(15)
           .fill(0)
           .map(
             () => new Enemy(this.layoutEditor.mapData, this.player, this.ctx),
@@ -60,10 +60,10 @@ export default class Game {
       this.layout.renderMap();
       // TODO: hide itemCanvas from layoutEditor
       this.layoutEditor.itemCanvas.style.display = "none";
-      this.player.draw();
       for (let enemy of this.enemyArray) {
         enemy.draw();
       }
+      this.player.draw();
     }
   }
 }

@@ -18,6 +18,9 @@ export default class Enemy {
   sPosition: Point;
   sWidth: number;
   sHeight: number;
+  prevX: number;
+  prevY: number;
+  prevItem: Items;
   spriteName: EnemySprite;
   speed: number;
   direction: Direction;
@@ -28,6 +31,8 @@ export default class Enemy {
   spriteCounter: number;
   enemyOffset: number = 5;
   mapData: MapData;
+  isDying: boolean = false;
+  isDead: boolean = false;
   player: Player;
   img: HTMLImageElement;
   ctx: CanvasRenderingContext2D;
@@ -48,6 +53,9 @@ export default class Enemy {
     this.sWidth = ENEMIES.sprites[this.spriteName].sWidth as number;
     this.sHeight = ENEMIES.sprites[this.spriteName].sWidth as number;
     this.speed = ENEMIES.sprites[this.spriteName].speed as number;
+    this.prevX = 0;
+    this.prevY = 0;
+    this.prevItem = Items.Empty;
 
     this.img = images.enemies[this.spriteName];
     this.direction = getRandomValue(Direction)!;
@@ -55,31 +63,35 @@ export default class Enemy {
   }
 
   draw() {
-    this.elaspedFrame++;
-    this.currentFrame = (this.currentFrame + 1) % this.frameIndexes.length;
+    if (this.isDead) return;
 
-    // check collision with player
-    this.isCollidedWithPlayer();
+    if (!this.isDying) {
+      this.elaspedFrame++;
+      this.currentFrame = (this.currentFrame + 1) % this.frameIndexes.length;
 
-    switch (this.direction) {
-      case Direction.Left: {
-        this.moveLeft();
-        break;
+      // check collision with player
+      this.isCollidedWithPlayer();
+
+      switch (this.direction) {
+        case Direction.Left: {
+          this.moveLeft();
+          break;
+        }
+        case Direction.Up: {
+          this.moveUp();
+          break;
+        }
+        case Direction.Right: {
+          this.moveRight();
+          break;
+        }
+        case Direction.Down: {
+          this.moveDown();
+          break;
+        }
+        default:
+          break;
       }
-      case Direction.Up: {
-        this.moveUp();
-        break;
-      }
-      case Direction.Right: {
-        this.moveRight();
-        break;
-      }
-      case Direction.Down: {
-        this.moveDown();
-        break;
-      }
-      default:
-        break;
     }
 
     this.ctx.drawImage(
@@ -197,7 +209,7 @@ export default class Enemy {
       this.player.isDead = true;
       const { x, y } = this.player.calculateCoordinate();
       this.mapData.tiles[x][y] = Items.Empty;
-      clearTimeout(timeoutId)
+      clearTimeout(timeoutId);
     }, 2000);
   }
 
