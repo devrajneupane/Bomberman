@@ -42,7 +42,7 @@ export class LayoutEditor extends Layout {
       enemies: images.enemies,
       powerUps: images.powerUps,
       door: {
-        door: images.door,
+        door: images.misc.door,
       },
     };
   }
@@ -67,7 +67,7 @@ export class LayoutEditor extends Layout {
     // Draw horizontal lines
     for (
       let x = MAP.tile.size;
-      x < this.mapData.width * MAP.tile.size;
+      x < (this.mapData.width - 20) * MAP.tile.size;
       x += MAP.tile.size
     ) {
       this.ctx.beginPath();

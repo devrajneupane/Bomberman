@@ -12,7 +12,7 @@ import Bomb from "./Bomb";
 import { MapData } from "./Layout";
 import Game from "./Game";
 import Collectible from "./Collectibles";
-
+import audio from "../audio/preload";
 
 export default class Player {
   position: Point;
@@ -54,7 +54,6 @@ export default class Player {
     this.ctx = ctx;
     this.game = game;
     this.collectible = collectible;
-
 
     this.position = {
       x: MAP.tile.size + this.playerOffset,
@@ -105,21 +104,26 @@ export default class Player {
       switch (true) {
         case keys.left:
           this.direction = Direction.Left;
+          audio.player.walkHorizontal.play();
           this.moveLeft();
           break;
         case keys.right:
           this.direction = Direction.Right;
+          audio.player.walkHorizontal.play();
           this.moveRight();
           break;
         case keys.up:
           this.direction = Direction.Up;
+          audio.player.walkVertical.play();
           this.moveUp();
           break;
         case keys.down:
           this.direction = Direction.Down;
+          audio.player.walkVertical.play();
           this.moveDown();
           break;
         case keys.keyX && !this.bomb.bombActive:
+          audio.bomb.putBomb.play();
           this.dropBomb();
           break;
         default:
@@ -275,7 +279,6 @@ export default class Player {
    */
   collecCollectible() {
     if (!isCollidedAABB(this, this.collectible)) return;
-    console.log("am i being collided");
 
     switch (this.collectible.name) {
       case Items.SpeedUp:

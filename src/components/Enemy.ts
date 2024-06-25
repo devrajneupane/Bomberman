@@ -1,3 +1,4 @@
+import Game from "./Game";
 import Player from "./Player";
 import { MapData } from "./Layout";
 import { Items } from "../enums/items";
@@ -5,13 +6,15 @@ import { Point } from "../types/point";
 import { EnemySprite } from "../types/EnemySprite";
 import { Direction } from "../enums/Direction";
 
-import { MAP } from "../constants/map";
-import { ENEMIES } from "../constants/sprites";
-
 import { images } from "../image/preload";
 import { getRandomKey, getRandomValue } from "../utils/helper";
 import { isCollidedAABB, isEnemyCollided } from "../utils/collision";
 import { getRandomEnemyPosition } from "../utils/getRandomEnemyPosition";
+import audio from "../audio/preload";
+
+import { MAP } from "../constants/map";
+import { ENEMIES } from "../constants/sprites";
+import GameState from "../enums/GameState";
 
 
 export default class Enemy {
@@ -37,12 +40,14 @@ export default class Enemy {
   isDying: boolean = false;
   isDead: boolean = false;
   player: Player;
+  game: Game;
   img: HTMLImageElement;
   ctx: CanvasRenderingContext2D;
 
-  constructor(mapData: MapData, player: Player, ctx: CanvasRenderingContext2D) {
+  constructor(mapData: MapData, player: Player, game: Game, ctx: CanvasRenderingContext2D) {
     this.ctx = ctx;
     this.player = player;
+    this.game = game;
     this.mapData = mapData;
     this.width = MAP.tile.size - this.enemyOffset;
     this.height = MAP.tile.size - this.enemyOffset;
@@ -201,12 +206,21 @@ export default class Enemy {
   isCollidedWithPlayer() {
     if (!isCollidedAABB(this.player, this)) return;
 
+    this.game.score = 0;
+    this.game.lives--;
+    if (this.game.lives <= 0) {
+      this.game.state = GameState.GameOver;
+    }
+
     this.player.img = images.player.playerDyingSprite;
     this.player.sHeight = 21;
     this.player.currentFrame = 0;
     this.player.elaspedFrame = 0;
     this.player.isDying = true;
     this.elaspedFrame = 0;
+
+    // play player dying sound
+    audio.player.lose.play();
 
     const timeoutId = setTimeout(() => {
       this.player.isDead = true;

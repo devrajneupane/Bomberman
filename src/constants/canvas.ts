@@ -3,5 +3,5 @@
  */
 export const CANVAS = {
   width: 1024,
-  height: 580,
+  height: 650,
 };

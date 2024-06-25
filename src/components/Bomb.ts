@@ -1,15 +1,21 @@
-import { MAP } from "../constants/map";
+import Game from "./Game";
+import Wall from "./Wall";
+import Player from "./Player";
+import GameState from "../enums/GameState";
+import Collectible from "./Collectibles";
+import BombExplosion from "./BombExplosion";
+
 import { Direction } from "../enums/Direction";
 import { Items } from "../enums/items";
-import { images } from "../image/preload";
 import { Obj } from "../types/Obj";
 import { Point } from "../types/point";
-import BombExplosion from "./BombExplosion";
-import Collectible from "./Collectibles";
-import Game from "./Game";
 import { MapData } from "./Layout";
-import Player from "./Player";
-import Wall from "./Wall";
+
+import audio from "../audio/preload";
+import { images } from "../image/preload";
+
+// Constants
+import { MAP } from "../constants/map";
 
 export default class Bomb {
   position: Point;
@@ -88,9 +94,6 @@ export default class Bomb {
     const frameIndex = this.frameIndexes[this.currentFrame];
     if (this.elaspedFrame % 25 === 0) {
       this.sPosition.x = frameIndex * this.sWidth;
-      if (frameIndex === 2) {
-        this.frameIndexes.reverse();
-      }
     }
   }
 
@@ -98,6 +101,7 @@ export default class Bomb {
    * Draw bomb explosion from bomb position
    */
   calculateExplosion() {
+    audio.bomb.explosion.play();
     this.frameIndexes.push(4);
     this.sPosition = { x: 0, y: 1 };
 
@@ -188,6 +192,11 @@ export default class Bomb {
       case Items.Player:
         // TODO: reset stage or game over
         this.game.score = 0;
+        this.game.lives--;
+
+        if (this.game.lives <= 0) {
+          this.game.state = GameState.GameOver;
+        }
 
         // Explode player
         this.player.img = images.player.playerDyingSprite;
@@ -196,6 +205,9 @@ export default class Bomb {
         this.player.elaspedFrame = 0;
         this.player.isDying = true;
         this.elaspedFrame = 0;
+
+        // play player dying sound
+        audio.player.lose.play();
 
         const timeoutId = setTimeout(() => {
           this.player.isDead = true;

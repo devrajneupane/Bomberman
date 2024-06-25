@@ -51,6 +51,7 @@ document.addEventListener("keydown", (event: KeyboardEvent) => {
       keys.enter = true;
       break;
     }
+    case "b":
     case " ": {
       keys.space = true;
       break;
@@ -59,9 +60,9 @@ document.addEventListener("keydown", (event: KeyboardEvent) => {
       keys.keyX = true;
       break;
     }
-    // NOTE: to quickly refresh the page
     case "r": {
-      location.reload()
+      // Quickly refresh the page
+      location.reload();
       break;
     }
   }
@@ -73,11 +74,9 @@ document.addEventListener("keyup", () => {
   keys.up = false;
   keys.down = false;
   keys.enter = false;
-  // keys.space = false;
+  keys.space = false;
   keys.keyX = false;
 });
-
-// TODO: make click event listner only active for layout editor
 
 // Event listener for when mouse button is preased inside item bar
 itemCanvas.addEventListener("click", (event: MouseEvent) => {
@@ -98,6 +97,7 @@ document.addEventListener("mousemove", (event: MouseEvent) => {
   if (isMouseDown) {
     clicks.canvas.add(event.x).add(event.y);
   }
+  canvas.style.cursor = "default";
 });
 
 // Event listener for when mouse button is released
@@ -105,6 +105,7 @@ document.addEventListener("mouseup", () => {
   if (isMouseDown) {
     isMouseDown = false;
   }
+  canvas.style.cursor = "pointer";
 });
 
 // Event listener for when right mouse button is pressed inside editor area

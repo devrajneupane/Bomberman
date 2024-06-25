@@ -25,9 +25,6 @@ import remoteControl from "/game/images/power-up/remote-control.png";
 import speedUp from "/game/images/power-up/speed-up.png";
 import wallPass from "/game/images/power-up/wall-pass.png";
 
-// Door
-import door from "/game/images/door.png";
-
 // enemies
 import ballomSprite from "/game/sprites/enemies/ballom.png";
 import dahlSprite from "/game/sprites/enemies/dahl.png";
@@ -36,7 +33,13 @@ import onilSprite from "/game/sprites/enemies/onil.png";
 import ovapeSprite from "/game/sprites/enemies/ovape.png";
 import passSprite from "/game/sprites/enemies/pass.png";
 import pontanSprite from "/game/sprites/enemies/pontan.png";
-import enemyDyingSprite from "/game/sprites/enemies/destroy-enemy/destroy-enemy.png"
+import enemyDyingSprite from "/game/sprites/enemies/destroy-enemy/destroy-enemy.png";
+
+// Banner
+import banner from "/game/images/menu-title.png"
+
+// Door
+import door from "/game/images/door.png";
 
 export const images = {
   wall: {
@@ -51,8 +54,12 @@ export const images = {
   bomb: {
     bombSprite: createImageElement(bombSprite),
     bombExplosionCenterSprite: createImageElement(bombExplosionCenterSprite),
-    bombExplosionExtensionHorizontalSprite: createImageElement(bombExplosionHorizontalSprite),
-    bombExplosionExtensionVerticalSprite: createImageElement(bombExplosionVerticalSprite),
+    bombExplosionExtensionHorizontalSprite: createImageElement(
+      bombExplosionHorizontalSprite,
+    ),
+    bombExplosionExtensionVerticalSprite: createImageElement(
+      bombExplosionVerticalSprite,
+    ),
     bombExplosionLeftSprite: createImageElement(bombExplosionLeftSprite),
     bombExplosionBottomSprite: createImageElement(bombExplosionBottomSprite),
     bombExplosionRightSprite: createImageElement(bombExplosionRightSprite),
@@ -74,9 +81,12 @@ export const images = {
     ovapeSprite: createImageElement(ovapeSprite),
     passSprite: createImageElement(passSprite),
     pontanSprite: createImageElement(pontanSprite),
-    enemyDyingSprite: createImageElement(enemyDyingSprite)
+    enemyDyingSprite: createImageElement(enemyDyingSprite),
   },
-  door: createImageElement(door),
+  misc: {
+    door: createImageElement(door),
+    banner: createImageElement(banner),
+  },
 };
 
 /**

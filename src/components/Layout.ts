@@ -105,7 +105,7 @@ export class Layout {
             this.img = images.powerUps.wallPass;
             break;
           case Items.Door:
-            this.img = images.door;
+            this.img = images.misc.door;
             break;
           default:
             break;
